@@ -3,7 +3,6 @@
 let lcdLastUpdateTime = 0
 const LCD_INTERVAL = 150
 
-
 enum LcdBacklight {
     //% block="on"
     On = 1,
@@ -14,7 +13,6 @@ enum LcdBacklight {
 
 
 namespace LogosSmart {
-
     const LCD1602_ADDR = 0x20
     let lcdBacklight = 0x08
 
