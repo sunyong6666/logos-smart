@@ -1,4 +1,3 @@
-const i2cAddress = 0x25;  // I2C设备地址
 
 enum MotorGroupMotion {
     //% block="forward"
@@ -39,7 +38,6 @@ enum RotationDirection {
 }
 
 
-//% color="#bcdf3e" icon="" block="Smart"
 namespace LogosSmart {
     //#########################################################################
     //################################## 运动(双电机) #########################

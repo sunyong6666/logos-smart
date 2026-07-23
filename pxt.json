@@ -6,6 +6,7 @@
         "microphone": "*"
     },
     "files": [
+        "main.ts",
         "block/servoMotor.ts",
         "README.md"
     ],
