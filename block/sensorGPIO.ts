@@ -5,18 +5,18 @@ namespace LogosSmart {
     // ==================== Button按钮模块 ====================
     //% blockId=LogosSmart_Button
     //% block="button pin %num pressed?"
-    //% group="Sensor"
-    //% weight=100
+    //% group="Button"
+    //% weight=99
     export function Button( num: enGPIOpin): boolean {
-        return pins.digitalReadPin(num) == 1
+        return pins.digitalReadPin(num) == 0
     }
 
 
     // ==================== 电位器模块 ====================
     //% blockId=LogosSmart_Potentiometer
-    //% block="Potentiometer pin %num value"
-    //% group="Sensor"
-    //% weight=98
+    //% block="potentiometer pin %num value"
+    //% group="Potentiometer"
+    //% weight=99
     export function Potentiometer( num: enGPIOpin): number {
         return pins.analogReadPin(num)
     }
@@ -24,9 +24,9 @@ namespace LogosSmart {
 
     // ==================== 光敏传感器模块 ====================
     //% blockId=LogosSmart_Photosensitive
-    //% block="Photosensitive pin %num value"
-    //% group="Sensor"
-    //% weight=96
+    //% block="photosensitive pin %num value"
+    //% group="Photosensitive"
+    //% weight=99
     export function Photosensitive(num: enGPIOpin): number {
         return pins.analogReadPin(num)
     }
@@ -34,9 +34,9 @@ namespace LogosSmart {
 
     // ==================== 灰度传感器模块 ====================
     //% blockId=LogosSmart_Grayscale
-    //% block="Grayscale pin %num value"
-    //% group="Sensor"
-    //% weight=94
+    //% block="grayscale pin %num value"
+    //% group="Grayscale"
+    //% weight=99
     export function Grayscale( num: enGPIOpin): number {
         return pins.analogReadPin(num)
     }
@@ -44,9 +44,9 @@ namespace LogosSmart {
 
     // ==================== 土壤湿度传感器模块 ====================
     //% blockId=LogosSmart_SoilHumidity
-    //% block="Soil humidity sensor pin %num value"
-    //% group="Sensor"
-    //% weight=92
+    //% block="soil humidity sensor pin %num value"
+    //% group="Soil Humidity"
+    //% weight=99
     export function SoilHumiditySensor( num: enGPIOpin): number {
         return pins.analogReadPin(num)
     }
