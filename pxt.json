@@ -11,6 +11,8 @@
         "block/output.ts",
         "block/lcd1602.ts",
         "block/rgbLED.ts",
+        "block/sensorGPIO.ts",
+        "block/sensorIIC.ts",
         "README.md"
     ],
     "testFiles": [
