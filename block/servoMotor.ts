@@ -1,411 +1,169 @@
-//------伺服电机模块-----------
+//====================电机模块====================
 
-enum smart_enMotorColor {
-    //% block="红色"
-    Red = 0x51,
-    //% block="绿色"
-    Green = 0x52,
-    //% block="蓝色"
-    Blue = 0x53,
-    //% block="黄色"
-    Yellow = 0x54
+enum enMotorcolor {
+    //% block="red"
+    red = 81,
+
+    //% block="green"
+    blue = 82,
+
+    //% block="blue"
+    green = 83,
+
+    //% block="yellow"
+    yellow = 84
 }
 
 namespace LogosSmart {
-    // ==================== 私有变量 ====================
-    let leftMotorAddr = smart_enMotorColor.Red;
-    let rightMotorAddr = smart_enMotorColor.Green;
-
-    // ==================== 协议常量 ====================
-    const CMD_SPEED = 0x11;       // 速度模式
-    const CMD_POS_ABS = 0x03;     // 绝对位置模式
-    const CMD_POS_REL = 0x04;     // 相对位置模式
-    const CMD_TIME = 0x12;        // 时间模式
-
-    const STATUS_RUNNING = 0x04;  // 电机运行中
-    const STATUS_DONE = 0x0B;     // 运行完成
-    const STATUS_STALL = 0x0A;    // 堵转停止
-
-    // ==================== 私有工具函数 ====================
-
-    /**
-     * 将用户速度(-100~100)转换为协议值
-     * 规则：除以2，负数最高位(0x80)置1表示方向
-     */
-    function encodeSpeed(userSpeed: number): number {
-        userSpeed = Math.floor(userSpeed / 2);
-        if (userSpeed < 0) {
-            userSpeed = -userSpeed;
-            return (~userSpeed + 1) | 0x80;
-        }
-        return userSpeed;
-    }
-
-    /**
-     * 将用户角度转换为协议值（用于相对位置）
-     * 负数最高位(0x8000)置1表示反向
-     */
-    function encodeRelPosition(pos: number): number {
-        if (pos < 0) {
-            pos = -pos;
-            return (~pos + 1) | 0x8000;
-        }
-        return pos;
-    }
-
-    /**
-     * 将用户角度转换为协议值（用于绝对位置）
-     * 负数最高位(0x8000)置1表示反向
-     */
-    function encodeAbsPosition(pos: number): number {
-        if (pos < 0) {
-            pos = -pos;
-            return (~pos + 1) | 0x8000;
-        }
-        return pos;
-    }
-
-    /**
-     * 从6字节缓冲区解析当前位置
-     * 字节1(高位)+字节2(低位)，最高位为符号位
-     */
-    function parsePosition(buf: Buffer): number {
-        let raw = (buf.getNumber(NumberFormat.Int8BE, 1) << 8)
-            | buf.getNumber(NumberFormat.Int8BE, 2);
-        if (raw & 0x8000) {
-            return raw | 0xFFFF0000;  // 符号扩展到32位
-        }
-        return raw;
-    }
-
-    /**
-     * 从6字节缓冲区解析当前速度
-     * 字节0(高位)+字节1(低位)，最高位为符号位
-     */
-    function parseSpeed(buf: Buffer): number {
-        let raw = (buf.getNumber(NumberFormat.Int8BE, 0) << 8)
-            | buf.getNumber(NumberFormat.Int8BE, 1);
-        if (raw & 0x8000) {
-            return raw | 0xFFFF0000;
-        }
-        return raw;
-    }
-
-    /**
-     * 读取电机状态字节(第6字节)
-     */
-    function readStatus(addr: number): number {
-        const buf = pins.i2cReadBuffer(addr, 6);
-        return buf.getNumber(NumberFormat.Int8BE, 5);
-    }
-
-    /**
-     * 等待电机启动（状态变为 RUNNING）
-     */
-    function waitMotorStart(addr: number): void {
-        while (true) {
-            if ((readStatus(addr) & 0x0F) === STATUS_RUNNING) {
-                break;
-            }
-        }
-    }
-
-    /**
-     * 等待电机停止（状态变为 DONE 或 STALL）
-     */
-    function waitMotorStop(addr: number): void {
-        while (true) {
-            const status = readStatus(addr) & 0x0F;
-            if (status === STATUS_DONE || status === STATUS_STALL) {
-                break;
-            }
-        }
-    }
-
-    /**
-     * 等待双电机全部停止
-     */
-    function waitDualMotorStop(addr1: number, addr2: number): void {
-        while (true) {
-            const s1 = readStatus(addr1) & 0x0F;
-            const s2 = readStatus(addr2) & 0x0F;
-            if ((s1 === STATUS_DONE || s1 === STATUS_STALL) &&
-                (s2 === STATUS_DONE || s2 === STATUS_STALL)) {
-                break;
-            }
-        }
-    }
-
-    /**
-     * 等待任意一台电机启动（用于双电机同步）
-     */
-    function waitAnyMotorStart(addr1: number, addr2: number): void {
-        while (true) {
-            const s1 = readStatus(addr1) & 0x0F;
-            const s2 = readStatus(addr2) & 0x0F;
-            if (s1 === STATUS_RUNNING || s2 === STATUS_RUNNING) {
-                break;
-            }
-        }
-    }
-
-    /**
-     * 检查位置是否在目标范围内（±5度死区）
-     */
-    function isPositionReached(current: number, target: number): boolean {
-        return (current >= target - 5) && (current <= target + 5);
-    }
+    let caraddress1 = 81
+    let caraddress2 = 82
 
 
-
-
-
-    // ==================== 读取  ====================
-
-    //% blockId=readmotorspeed
-    //% block="读取|%motoraddress|电机的转速"
-    //% group="Movement"
-    //% weight=99
-    export function readMotorSpeed(motoraddress: smart_enMotorColor): number {
-        const buf = pins.i2cReadBuffer(motoraddress, 6);
-        return parseSpeed(buf);
-    }
-
-    //% blockId=readmotorlocation
-    //% block="读取|%motoraddress|电机的位置"
-    //% group="Movement"
-    //% weight=98
-    export function readMotorLocation(motoraddress: smart_enMotorColor): number {
-        const buf = pins.i2cReadBuffer(motoraddress, 6);
-        return parsePosition(buf);
-    }
-
-    // ==================== 单电机 ====================
-
-    //% blockId=runMotor
-    //% block="|%motoraddress|Motor rotate at|%speed|"
+    
+    //% blockId=LogosSmart_runMotor
+    //% block="Motor %motoraddress rotate at %speed"
     //% speed.min=-100 speed.max=100
-    //% group="Movement"
-    //% weight=89
-    export function runMotor(motoraddress: smart_enMotorColor, speed: number): void {
-        const encodedSpeed = encodeSpeed(speed);
-        const buf = pins.createBuffer(4);
-        buf.setNumber(NumberFormat.UInt8BE, 0, CMD_SPEED);
-        buf.setNumber(NumberFormat.UInt8BE, 1, encodedSpeed);
-        buf.setNumber(NumberFormat.UInt8BE, 2, 0);
-        buf.setNumber(NumberFormat.UInt8BE, 3, 0);
-        pins.i2cWriteBuffer(motoraddress, buf);
+    //% group="Motor"
+    export function runMotor(motoraddress: enMotorcolor, speed: number): void {
+        speed = speed / 2
+        let speed_Buff
+        if (speed < 0) {
+            speed = -speed
+            speed_Buff = (~speed) + 1
+            speed_Buff = speed_Buff | 0x80
+        } else {
+            speed_Buff = speed
+        }
+
+        let SetBuff = pins.createBuffer(4)
+        SetBuff.setNumber(NumberFormat.UInt8BE, 0, 0x11)
+        SetBuff.setNumber(NumberFormat.UInt8BE, 1, speed_Buff)
+        SetBuff.setNumber(NumberFormat.UInt8BE, 2, 0)
+        SetBuff.setNumber(NumberFormat.UInt8BE, 3, 0)
+
+        pins.i2cWriteBuffer(motoraddress, SetBuff)
     }
 
-    //% blockId=writemotorlocation
-    //% block="|%motoraddress|电机以|%speed|的速度转到|%location|度"
+
+    //绝对位移
+    //% blockId=LogosSmart_writeMotorLocation
+    //% block="Motor %motoraddress rotate speed %speed to %location degrees"
     //% speed.min=0 speed.max=100
     //% location.min=-360 location.max=360
-    //% group="Movement"
-    //% weight=88
-    export function writeMotorLocation(
-        motoraddress: smart_enMotorColor,
-        speed: number,
-        location: number
-    ): void {
-        if (speed === 0) return;
-
-        const encodedSpeed = encodeSpeed(speed);
-        const encodedPos = encodeAbsPosition(location);
-
-        // 检查是否已到达目标位置（±5度死区）
-        const statusBuf = pins.i2cReadBuffer(motoraddress, 6);
-        if (isPositionReached(parsePosition(statusBuf), location)) {
-            return;
+    //% group="Motor"
+    export function writeMotorLocation(motoraddress: enMotorcolor, speed: number, location: number): void {
+        if (speed == 0) {
+            return
         }
+        speed = speed / 2
 
-        const buf = pins.createBuffer(4);
-        buf.setNumber(NumberFormat.UInt8BE, 0, CMD_POS_ABS);
-        buf.setNumber(NumberFormat.UInt8BE, 1, encodedSpeed);
-        buf.setNumber(NumberFormat.UInt8BE, 2, encodedPos >> 8);
-        buf.setNumber(NumberFormat.UInt8BE, 3, encodedPos);
-        pins.i2cWriteBuffer(motoraddress, buf);
-
-        waitMotorStart(motoraddress);
-        waitMotorStop(motoraddress);
-    }
-
-    //% blockId=writemotorrelativelocation
-    //% block="|%motoraddress|电机以|%speed|的速度相对旋转|%location|度"
-    //% speed.min=-100 speed.max=100
-    //% location.min=0
-    //% group="Movement"
-    //% weight=87
-    export function writeMotorRelativeLocation(
-        motoraddress: smart_enMotorColor,
-        speed: number,
-        location: number
-    ): void {
-        // ±5度以内直接忽略
-        if (location >= -5 && location <= 5) return;
-
-        const encodedSpeed = encodeSpeed(speed);
-        const encodedPos = encodeRelPosition(location);
-
-        const buf = pins.createBuffer(4);
-        buf.setNumber(NumberFormat.UInt8BE, 0, CMD_POS_REL);
-        buf.setNumber(NumberFormat.UInt8BE, 1, encodedSpeed);
-        buf.setNumber(NumberFormat.UInt8BE, 2, encodedPos >> 8);
-        buf.setNumber(NumberFormat.UInt8BE, 3, encodedPos);
-        pins.i2cWriteBuffer(motoraddress, buf);
-
-        waitMotorStart(motoraddress);
-        waitMotorStop(motoraddress);
-    }
-
-    //% blockId=writemotorrelativetime
-    //% block="|%motoraddress|电机以|%speed|的速度运行|%time|秒"
-    //% speed.min=-100 speed.max=100
-    //% group="Movement"
-    //% weight=86
-    export function writeMotorRelativeTime(
-        motoraddress: smart_enMotorColor,
-        speed: number,
-        time: number
-    ): void {
-        const encodedSpeed = encodeSpeed(speed);
-
-        // 最小运行时间限制为0.1秒
-        if (time > 0 && time < 0.1) time = 0.1;
-        const encodedTime = Math.floor(time * 10);
-
-        const buf = pins.createBuffer(4);
-        buf.setNumber(NumberFormat.UInt8BE, 0, CMD_TIME);
-        buf.setNumber(NumberFormat.UInt8BE, 1, encodedSpeed);
-        buf.setNumber(NumberFormat.UInt8BE, 2, encodedTime >> 8);
-        buf.setNumber(NumberFormat.UInt8BE, 3, encodedTime);
-        pins.i2cWriteBuffer(motoraddress, buf);
-
-        if (encodedTime === 0) return;
-
-        if (encodedSpeed & 0x80) {
-            // 负速度：用延时等待
-            const endTime = control.millis() + encodedTime * 100;
-            while (control.millis() <= endTime) {}
+        let speed_Buff2
+        if (speed < 0) {
+            speed = -speed
+            speed_Buff2 = (~speed) + 1
+            speed_Buff2 = speed_Buff2 | 0x80
         } else {
-            // 正速度：等待状态机
-            waitMotorStart(motoraddress);
-            waitMotorStop(motoraddress);
+            speed_Buff2 = speed
+        }
+
+        let location_Buff2
+        if (location < 0) {
+            location = -location
+            location_Buff2 = (~location) + 1
+            location_Buff2 = location_Buff2 | 0x8000
+        } else {
+            location_Buff2 = location
+        }
+
+        let GetBuff3 = pins.createBuffer(6)
+        GetBuff3 = pins.i2cReadBuffer(motoraddress, 6)
+
+        // if (((location - 5) <= getMotorLocation(GetBuff3)) && (getMotorLocation(GetBuff3) <= (location + 5))) {
+        //     return
+        // }
+
+        let SetBuff2 = pins.createBuffer(4)
+
+        SetBuff2.setNumber(NumberFormat.UInt8BE, 0, 0x3)
+        SetBuff2.setNumber(NumberFormat.UInt8BE, 1, speed_Buff2)
+        SetBuff2.setNumber(NumberFormat.UInt8BE, 2, location_Buff2 >> 8)
+        SetBuff2.setNumber(NumberFormat.UInt8BE, 3, location_Buff2)
+
+        pins.i2cWriteBuffer(motoraddress, SetBuff2)
+
+        let flag2 = GetBuff3.getNumber(NumberFormat.Int8BE, 5)
+
+        while (true) {
+            GetBuff3 = pins.i2cReadBuffer(motoraddress, 6)
+            flag2 = GetBuff3.getNumber(NumberFormat.Int8BE, 5)
+            if (flag2 == 3) break
+        }
+
+        while (true) {
+            GetBuff3 = pins.i2cReadBuffer(motoraddress, 6)
+            flag2 = GetBuff3.getNumber(NumberFormat.Int8BE, 5)
+            if (flag2 == 11 || flag2 == 10) break
         }
     }
 
-    // ==================== 双电机  ====================
-
-    //% blockId=setDMotor
-    //% block="设置左电机地址为|%motoraddress1|，右电机地址为|%motoraddress2|"
-    //% group="Movement"
-    //% weight=79
-    export function setDMotor(
-        motoraddress1: smart_enMotorColor,
-        motoraddress2: smart_enMotorColor
-    ): void {
-        leftMotorAddr = motoraddress1;
-        rightMotorAddr = motoraddress2;
-    }
-
-    
-
-    //% blockId=writeDmotorlocation
-    //% block="双电机以|%speed1|和|%speed2|的速度转到|%location|度"
-    //% speed1.min=-100 speed1.max=100
-    //% speed2.min=-100 speed2.max=100
+    //相对位移
+    //% blockId=LogosSmart_writeMotorRelativeLocation
+    //% block="Motor %motoraddress rotate speed %speed relative %location degrees"
+    //% speed.min=-100 speed.max=100
     //% location.min=0
-    //% group="Movement"
-    //% weight=78
-    export function writeDMotorLocation(
-        speed1: number,
-        speed2: number,
-        location: number
-    ): void {
-        if (location >= -5 && location <= 5) return;
+    //% group="Motor"
+    export function writeMotorRelativeLocation(motoraddress: enMotorcolor, speed: number, location: number): void {
+        if (((location <= 5) && (location >= 0)) || ((location >= -5) && (location <= 0))) {
+            return
+        }
 
-        const buf1 = pins.createBuffer(4);
-        const buf2 = pins.createBuffer(4);
+        speed = speed / 2
+        let location_Buff22
 
-        buf1.setNumber(NumberFormat.UInt8BE, 0, CMD_POS_REL);
-        buf1.setNumber(NumberFormat.UInt8BE, 1, encodeSpeed(-speed1));
-        buf1.setNumber(NumberFormat.UInt8BE, 2, encodeRelPosition(location) >> 8);
-        buf1.setNumber(NumberFormat.UInt8BE, 3, encodeRelPosition(location));
+        if (speed < 0) {
+            speed = -speed
+            location_Buff22 = (~location) + 1
+            location_Buff22 = location_Buff22 | 0x8000
+        } else {
+            location_Buff22 = location
+        }
 
-        buf2.setNumber(NumberFormat.UInt8BE, 0, CMD_POS_REL);
-        buf2.setNumber(NumberFormat.UInt8BE, 1, encodeSpeed(speed2));
-        buf2.setNumber(NumberFormat.UInt8BE, 2, encodeRelPosition(location) >> 8);
-        buf2.setNumber(NumberFormat.UInt8BE, 3, encodeRelPosition(location));
+        let SetBuff = pins.createBuffer(4)
 
-        pins.i2cWriteBuffer(leftMotorAddr, buf1);
-        pins.i2cWriteBuffer(rightMotorAddr, buf2);
+        SetBuff.setNumber(NumberFormat.UInt8BE, 0, 0x4)
+        SetBuff.setNumber(NumberFormat.UInt8BE, 1, speed)
+        SetBuff.setNumber(NumberFormat.UInt8BE, 2, location_Buff22 >> 8)
+        SetBuff.setNumber(NumberFormat.UInt8BE, 3, location_Buff22)
 
-        waitAnyMotorStart(leftMotorAddr, rightMotorAddr);
-        waitDualMotorStop(leftMotorAddr, rightMotorAddr);
-    }
 
-    //% blockId=writeDmotortime
-    //% block="双电机以|%speed1|和|%speed2|的速度运行|%time|秒"
-    //% speed1.min=-100 speed1.max=100
-    //% speed2.min=-100 speed2.max=100
-    //% time.min=0
-    //% group="Movement"
-    //% weight=77
-    export function writeDMotorTime(
-        speed1: number,
-        speed2: number,
-        time: number
-    ): void {
-        if (time > 0 && time < 0.1) time = 0.1;
-        const encodedTime = Math.floor(time * 10);
+        let GetBuff = pins.createBuffer(6)
+        let flag3 = 0
 
-        const buf1 = pins.createBuffer(4);
-        const buf2 = pins.createBuffer(4);
+        if (speed != 0) {
+            pins.i2cWriteBuffer(motoraddress, SetBuff)
+        } else {
+            location = 0
+        }
 
-        buf1.setNumber(NumberFormat.UInt8BE, 0, CMD_TIME);
-        buf1.setNumber(NumberFormat.UInt8BE, 1, encodeSpeed(-speed1));
-        buf1.setNumber(NumberFormat.UInt8BE, 2, encodedTime >> 8);
-        buf1.setNumber(NumberFormat.UInt8BE, 3, encodedTime);
+        if (location != 0) {
+            while (true) {
+                GetBuff = pins.i2cReadBuffer(motoraddress, 6)
+                flag3 = GetBuff.getNumber(NumberFormat.Int8BE, 5)
+                if (flag3 == 4) break
+            }
 
-        buf2.setNumber(NumberFormat.UInt8BE, 0, CMD_TIME);
-        buf2.setNumber(NumberFormat.UInt8BE, 1, encodeSpeed(speed2));
-        buf2.setNumber(NumberFormat.UInt8BE, 2, encodedTime >> 8);
-        buf2.setNumber(NumberFormat.UInt8BE, 3, encodedTime);
-
-        if (speed1 !== 0) pins.i2cWriteBuffer(leftMotorAddr, buf1);
-        if (speed2 !== 0) pins.i2cWriteBuffer(rightMotorAddr, buf2);
-
-        if (encodedTime !== 0 && (speed1 !== 0 || speed2 !== 0)) {
-            waitAnyMotorStart(leftMotorAddr, rightMotorAddr);
-            waitDualMotorStop(leftMotorAddr, rightMotorAddr);
+            while (true) {
+                GetBuff = pins.i2cReadBuffer(motoraddress, 6)
+                flag3 = GetBuff.getNumber(NumberFormat.Int8BE, 5)
+                if (flag3 == 11 || flag3 == 10) break
+            }
         }
     }
 
-    //% blockId=runDMotor
-    //% block="左电机以|%speed1|的速度、右电机以|%speed2|的速度旋转"
-    //% speed1.min=-100 speed1.max=100
-    //% speed2.min=-100 speed2.max=100
-    //% group="Movement"
-    //% weight=76
-    export function runDMotor(speed1: number, speed2: number): void {
-        const buf1 = pins.createBuffer(4);
-        const buf2 = pins.createBuffer(4);
 
-        buf1.setNumber(NumberFormat.UInt8BE, 0, CMD_SPEED);
-        buf1.setNumber(NumberFormat.UInt8BE, 1, encodeSpeed(-speed1)); // 左电机方向反转
-        buf1.setNumber(NumberFormat.UInt8BE, 2, 0);
-        buf1.setNumber(NumberFormat.UInt8BE, 3, 0);
 
-        buf2.setNumber(NumberFormat.UInt8BE, 0, CMD_SPEED);
-        buf2.setNumber(NumberFormat.UInt8BE, 1, encodeSpeed(speed2));
-        buf2.setNumber(NumberFormat.UInt8BE, 2, 0);
-        buf2.setNumber(NumberFormat.UInt8BE, 3, 0);
-
-        pins.i2cWriteBuffer(leftMotorAddr, buf1);
-        pins.i2cWriteBuffer(rightMotorAddr, buf2);
-    }
-
-    
 
     
 }
+
+    
