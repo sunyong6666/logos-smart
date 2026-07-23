@@ -3,7 +3,7 @@
 namespace LogosSmart {
     // ==================== 舵机模块 ====================
     //% blockId=LogosSmart_Servo
-    //% block="Servo pin %num angle %value"
+    //% block="servo pin %num angle %value"
     //% value.min=0 value.max=180
     //% group="Servo"
     //% weight=99
