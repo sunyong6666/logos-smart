@@ -9,6 +9,7 @@
         "main.ts",
         "block/servoMotor.ts",
         "block/output.ts",
+        "block/lcd1602.ts",
         "README.md"
     ],
     "testFiles": [
