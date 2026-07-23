@@ -12,14 +12,11 @@ enum smart_enMotorColor {
 }
 
 namespace LogosSmart {
-
     // ==================== 私有变量 ====================
-
     let leftMotorAddr = smart_enMotorColor.Red;
     let rightMotorAddr = smart_enMotorColor.Green;
 
     // ==================== 协议常量 ====================
-
     const CMD_SPEED = 0x11;       // 速度模式
     const CMD_POS_ABS = 0x03;     // 绝对位置模式
     const CMD_POS_REL = 0x04;     // 相对位置模式
@@ -159,12 +156,37 @@ namespace LogosSmart {
         return (current >= target - 5) && (current <= target + 5);
     }
 
+
+
+
+
+    // ==================== 读取  ====================
+
+    //% blockId=readmotorspeed
+    //% block="读取|%motoraddress|电机的转速"
+    //% group="Movement"
+    //% weight=99
+    export function readMotorSpeed(motoraddress: smart_enMotorColor): number {
+        const buf = pins.i2cReadBuffer(motoraddress, 6);
+        return parseSpeed(buf);
+    }
+
+    //% blockId=readmotorlocation
+    //% block="读取|%motoraddress|电机的位置"
+    //% group="Movement"
+    //% weight=98
+    export function readMotorLocation(motoraddress: smart_enMotorColor): number {
+        const buf = pins.i2cReadBuffer(motoraddress, 6);
+        return parsePosition(buf);
+    }
+
     // ==================== 单电机 ====================
 
     //% blockId=SuperBit_runMotor
-    //% block="|%motoraddress|电机以|%speed|的速度旋转"
+    //% block="|%motoraddress|Motor rotate at|%speed|"
     //% speed.min=-100 speed.max=100
-    //% parts="SuperBit_runMotor" subcategory=Movement group="伺服电机"
+    //% group="Movement"
+    //% weight=89
     export function runMotor(motoraddress: smart_enMotorColor, speed: number): void {
         const encodedSpeed = encodeSpeed(speed);
         const buf = pins.createBuffer(4);
@@ -179,7 +201,8 @@ namespace LogosSmart {
     //% block="|%motoraddress|电机以|%speed|的速度转到|%location|度"
     //% speed.min=0 speed.max=100
     //% location.min=-360 location.max=360
-    //% parts="writemotorlocation" subcategory=Movement group="伺服电机"
+    //% group="Movement"
+    //% weight=88
     export function writeMotorLocation(
         motoraddress: smart_enMotorColor,
         speed: number,
@@ -211,7 +234,8 @@ namespace LogosSmart {
     //% block="|%motoraddress|电机以|%speed|的速度相对旋转|%location|度"
     //% speed.min=-100 speed.max=100
     //% location.min=0
-    //% parts="writemotorrelativelocation" subcategory=Movement group="伺服电机"
+    //% group="Movement"
+    //% weight=87
     export function writeMotorRelativeLocation(
         motoraddress: smart_enMotorColor,
         speed: number,
@@ -237,7 +261,8 @@ namespace LogosSmart {
     //% blockId=writemotorrelativetime
     //% block="|%motoraddress|电机以|%speed|的速度运行|%time|秒"
     //% speed.min=-100 speed.max=100
-    //% parts="writemotorrelativetime" subcategory=Movement group="伺服电机"
+    //% group="Movement"
+    //% weight=86
     export function writeMotorRelativeTime(
         motoraddress: smart_enMotorColor,
         speed: number,
@@ -275,7 +300,8 @@ namespace LogosSmart {
     //% block="左电机以|%speed1|的速度、右电机以|%speed2|的速度旋转"
     //% speed1.min=-100 speed1.max=100
     //% speed2.min=-100 speed2.max=100
-    //% parts="SuperBit_runDMotor" subcategory=Movement group="伺服电机"
+    //% group="Movement"
+    //% weight=79
     export function runDMotor(speed1: number, speed2: number): void {
         const buf1 = pins.createBuffer(4);
         const buf2 = pins.createBuffer(4);
@@ -299,7 +325,8 @@ namespace LogosSmart {
     //% speed1.min=-100 speed1.max=100
     //% speed2.min=-100 speed2.max=100
     //% location.min=0
-    //% parts="writeDmotorlocation" subcategory=Movement group="伺服电机"
+    //% group="Movement"
+    //% weight=78
     export function writeDMotorLocation(
         speed1: number,
         speed2: number,
@@ -332,7 +359,8 @@ namespace LogosSmart {
     //% speed1.min=-100 speed1.max=100
     //% speed2.min=-100 speed2.max=100
     //% time.min=0
-    //% parts="writeDmotortime" subcategory=Movement group="伺服电机"
+    //% pgroup="Movement"
+    //% weight=77
     export function writeDMotorTime(
         speed1: number,
         speed2: number,
@@ -365,7 +393,8 @@ namespace LogosSmart {
 
     //% blockId=SuperBit_DMotor
     //% block="设置左电机地址为|%motoraddress1|，右电机地址为|%motoraddress2|"
-    //% parts="SuperBit_DMotor" subcategory=Movement group="伺服电机"
+    //% group="Movement"
+    //% weight=76
     export function setDMotor(
         motoraddress1: smart_enMotorColor,
         motoraddress2: smart_enMotorColor
@@ -374,21 +403,5 @@ namespace LogosSmart {
         rightMotorAddr = motoraddress2;
     }
 
-    // ==================== 读取  ====================
-
-    //% blockId=readmotorspeed
-    //% block="读取|%motoraddress|电机的转速"
-    //% parts="readmotorspeed" subcategory=Movement group="伺服电机"
-    export function readMotorSpeed(motoraddress: smart_enMotorColor): number {
-        const buf = pins.i2cReadBuffer(motoraddress, 6);
-        return parseSpeed(buf);
-    }
-
-    //% blockId=readmotorlocation
-    //% block="读取|%motoraddress|电机的位置"
-    //% parts="readmotorlocation" subcategory=Movement group="伺服电机"
-    export function readMotorLocation(motoraddress: smart_enMotorColor): number {
-        const buf = pins.i2cReadBuffer(motoraddress, 6);
-        return parsePosition(buf);
-    }
+    
 }
