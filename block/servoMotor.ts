@@ -182,7 +182,7 @@ namespace LogosSmart {
 
     // ==================== 单电机 ====================
 
-    //% blockId=SuperBit_runMotor
+    //% blockId=runMotor
     //% block="|%motoraddress|Motor rotate at|%speed|"
     //% speed.min=-100 speed.max=100
     //% group="Movement"
@@ -296,29 +296,19 @@ namespace LogosSmart {
 
     // ==================== 双电机  ====================
 
-    //% blockId=SuperBit_runDMotor
-    //% block="左电机以|%speed1|的速度、右电机以|%speed2|的速度旋转"
-    //% speed1.min=-100 speed1.max=100
-    //% speed2.min=-100 speed2.max=100
+    //% blockId=setDMotor
+    //% block="设置左电机地址为|%motoraddress1|，右电机地址为|%motoraddress2|"
     //% group="Movement"
     //% weight=79
-    export function runDMotor(speed1: number, speed2: number): void {
-        const buf1 = pins.createBuffer(4);
-        const buf2 = pins.createBuffer(4);
-
-        buf1.setNumber(NumberFormat.UInt8BE, 0, CMD_SPEED);
-        buf1.setNumber(NumberFormat.UInt8BE, 1, encodeSpeed(-speed1)); // 左电机方向反转
-        buf1.setNumber(NumberFormat.UInt8BE, 2, 0);
-        buf1.setNumber(NumberFormat.UInt8BE, 3, 0);
-
-        buf2.setNumber(NumberFormat.UInt8BE, 0, CMD_SPEED);
-        buf2.setNumber(NumberFormat.UInt8BE, 1, encodeSpeed(speed2));
-        buf2.setNumber(NumberFormat.UInt8BE, 2, 0);
-        buf2.setNumber(NumberFormat.UInt8BE, 3, 0);
-
-        pins.i2cWriteBuffer(leftMotorAddr, buf1);
-        pins.i2cWriteBuffer(rightMotorAddr, buf2);
+    export function setDMotor(
+        motoraddress1: smart_enMotorColor,
+        motoraddress2: smart_enMotorColor
+    ): void {
+        leftMotorAddr = motoraddress1;
+        rightMotorAddr = motoraddress2;
     }
+
+    
 
     //% blockId=writeDmotorlocation
     //% block="双电机以|%speed1|和|%speed2|的速度转到|%location|度"
@@ -359,7 +349,7 @@ namespace LogosSmart {
     //% speed1.min=-100 speed1.max=100
     //% speed2.min=-100 speed2.max=100
     //% time.min=0
-    //% pgroup="Movement"
+    //% group="Movement"
     //% weight=77
     export function writeDMotorTime(
         speed1: number,
@@ -391,17 +381,31 @@ namespace LogosSmart {
         }
     }
 
-    //% blockId=SuperBit_DMotor
-    //% block="设置左电机地址为|%motoraddress1|，右电机地址为|%motoraddress2|"
+    //% blockId=runDMotor
+    //% block="左电机以|%speed1|的速度、右电机以|%speed2|的速度旋转"
+    //% speed1.min=-100 speed1.max=100
+    //% speed2.min=-100 speed2.max=100
     //% group="Movement"
     //% weight=76
-    export function setDMotor(
-        motoraddress1: smart_enMotorColor,
-        motoraddress2: smart_enMotorColor
-    ): void {
-        leftMotorAddr = motoraddress1;
-        rightMotorAddr = motoraddress2;
+    export function runDMotor(speed1: number, speed2: number): void {
+        const buf1 = pins.createBuffer(4);
+        const buf2 = pins.createBuffer(4);
+
+        buf1.setNumber(NumberFormat.UInt8BE, 0, CMD_SPEED);
+        buf1.setNumber(NumberFormat.UInt8BE, 1, encodeSpeed(-speed1)); // 左电机方向反转
+        buf1.setNumber(NumberFormat.UInt8BE, 2, 0);
+        buf1.setNumber(NumberFormat.UInt8BE, 3, 0);
+
+        buf2.setNumber(NumberFormat.UInt8BE, 0, CMD_SPEED);
+        buf2.setNumber(NumberFormat.UInt8BE, 1, encodeSpeed(speed2));
+        buf2.setNumber(NumberFormat.UInt8BE, 2, 0);
+        buf2.setNumber(NumberFormat.UInt8BE, 3, 0);
+
+        pins.i2cWriteBuffer(leftMotorAddr, buf1);
+        pins.i2cWriteBuffer(rightMotorAddr, buf2);
     }
+
+    
 
     
 }

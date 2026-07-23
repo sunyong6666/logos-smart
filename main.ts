@@ -1,6 +1,22 @@
 
 const i2cAddress = 0x25;  // I2C设备地址
 
+//gpio接口
+enum enGPIOpin {
+    //% block="P0"
+    p0 = AnalogPin.P0,
+
+    //% block="P1"
+    p1 = AnalogPin.P1,
+
+    //% block="P2"
+    p2 = AnalogPin.P2,
+
+    //% block="P3"
+    p3 = AnalogPin.P8
+}
+
+
 //% color="#bcdf3e" icon="" block="Smart"
 namespace LogosSmart {
 

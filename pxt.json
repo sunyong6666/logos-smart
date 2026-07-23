@@ -8,6 +8,7 @@
     "files": [
         "main.ts",
         "block/servoMotor.ts",
+        "block/geekServo.ts",
         "README.md"
     ],
     "testFiles": [
