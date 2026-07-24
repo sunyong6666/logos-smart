@@ -1,7 +1,7 @@
 //----------------------------------颜色传感器-------------------------------
-const GAIN_R = 1.82
+const GAIN_R = 1.85
 const GAIN_G = 1.5
-const GAIN_B = 2.4
+const GAIN_B = 2.6
 
 // ===== VEML6040 I2C 地址 =====
 const VEML6040_ADDR = 0x10
@@ -111,6 +111,20 @@ namespace LogosSmart {
 
         lastReadTime = now
     }
+    
+    function max3(a: number, b: number, c: number): number {
+        let m = a
+        if (b > m) m = b
+        if (c > m) m = c
+        return m
+    }
+
+    function min3(a: number, b: number, c: number): number {
+        let m = a
+        if (b < m) m = b
+        if (c < m) m = c
+        return m
+    }
 
 
     // ==================== 功能模块 ====================
@@ -153,8 +167,6 @@ namespace LogosSmart {
         ng /= sum
         nb /= sum
 
-        serial.writeLine("r="+nr + " g="+ng + " b="+nb)
-
         // ===== 计算 max/min =====
         let max = max3(nr, ng, nb)
         let min = min3(nr, ng, nb)
@@ -165,7 +177,7 @@ namespace LogosSmart {
         if (max != min) {
             s = (max - min) / max
         }
-        //serial.writeLine("S="+s + " w="+w)
+        serial.writeLine("S="+s + " w="+w)
         // ===== 黑白判断 =====
         // 黑色：亮度低
         if (w < 8500) {
@@ -235,18 +247,5 @@ namespace LogosSmart {
         return nw
     }
 
-    function max3(a: number, b: number, c: number): number {
-        let m = a
-        if (b > m) m = b
-        if (c > m) m = c
-        return m
-    }
-
-    function min3(a: number, b: number, c: number): number {
-        let m = a
-        if (b < m) m = b
-        if (c < m) m = c
-        return m
-    }
 }
 
