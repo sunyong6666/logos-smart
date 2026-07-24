@@ -1,6 +1,3 @@
-
-const i2cAddress = 0x25;  // I2C设备地址
-
 //gpio接口
 enum enGPIOpin {
     //% block="P0"
@@ -17,7 +14,7 @@ enum enGPIOpin {
 }
 
 
-//% color="#24cfc9" icon="" block="Smart"
+//% color="#24cfc9" icon="" block="Smart TEAM"
 namespace LogosSmart {
 
 
