@@ -32,7 +32,7 @@ enum SmartCompare {
 }
 
 
-//% color="#24cfc9" icon="" block="Smart TEAM"
+//% color="#24cfc9"  block="Smart TEAM"
 namespace LogosSmart {
 
 
