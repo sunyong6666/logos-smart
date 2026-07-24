@@ -30,13 +30,13 @@ enum rock {
 namespace LogosSmart {
 
     //% blockId=rockerGetValue
-    //% block="Joystick %direction moved"
+    //% block="joystick %direction moved"
     //% direction.fieldEditor="gridpicker"
     //% direction.fieldOptions.width=220
     //% direction.fieldOptions.columns=2
     //% group="Joystick Module"
     //% weight=27
-    export function rocker(direction: rocket): number {
+    export function rockerGetValue(direction: rocket): number {
         let buf = pins.createBuffer(3)
 
         buf = pins.i2cReadBuffer(rockerI2cAddress, 3)
@@ -52,7 +52,7 @@ namespace LogosSmart {
 
 
     //% blockId=rockerDetect
-    //% block="Joystick detected %orientation"
+    //% block="joystick detected %orientation"
     //% orientation.fieldEditor="gridpicker"
     //% orientation.fieldOptions.width=220
     //% orientation.fieldOptions.columns=2
