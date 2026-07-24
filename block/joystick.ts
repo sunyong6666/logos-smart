@@ -4,21 +4,19 @@ const rockerI2cAddress = 0x61;
 
 enum rocket {
     //% block="X"
-    X = 0,
+    X = 1,
 
     //% block="Y"
-    Y = 1,
+    Y = 2,
 
-    //% block="Z"
-    Z = 2
 }
 
 enum rock {
     //% block="up"
-    up = 1,
+    up = 2,
 
     //% block="down"
-    down = 2,
+    down = 1,
 
     //% block="left"
     left = 4,
@@ -29,11 +27,9 @@ enum rock {
 
 namespace LogosSmart {
 
+    //获取值
     //% blockId=rockerGetValue
     //% block="joystick %direction moved"
-    //% direction.fieldEditor="gridpicker"
-    //% direction.fieldOptions.width=220
-    //% direction.fieldOptions.columns=2
     //% group="Joystick Module"
     //% weight=99
     export function rockerGetValue(direction: rocket): number {
@@ -51,11 +47,9 @@ namespace LogosSmart {
     }
 
 
+    //方向判断
     //% blockId=rockerDetect
     //% block="joystick detected %orientation"
-    //% orientation.fieldEditor="gridpicker"
-    //% orientation.fieldOptions.width=220
-    //% orientation.fieldOptions.columns=2
     //% group="Joystick Module"
     //% weight=98
     export function rockerDetect(orientation: rock): boolean {
