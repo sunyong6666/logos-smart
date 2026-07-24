@@ -21,6 +21,7 @@
         "block/veml6040.ts",
         "README.md"
     ],
+    "icon": "icon.svg",
     "testFiles": [
         "test.ts"
     ],
