@@ -17,7 +17,7 @@ enum enGPIOpin {
 }
 
 
-//% color="#bcdf3e" icon="" block="Smart"
+//% color="#24cfc9" icon="" block="Smart"
 namespace LogosSmart {
 
 

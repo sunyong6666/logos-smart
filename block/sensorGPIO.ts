@@ -7,6 +7,7 @@ namespace LogosSmart {
     //% block="button pin %num pressed?"
     //% group="Button"
     //% weight=99
+    //% color="#f1bd42"
     export function Button( num: enGPIOpin): boolean {
         return pins.digitalReadPin(num) == 0
     }
@@ -17,6 +18,7 @@ namespace LogosSmart {
     //% block="potentiometer pin %num value"
     //% group="Potentiometer"
     //% weight=99
+    //% color="#f1bd42"
     export function Potentiometer( num: enGPIOpin): number {
         return pins.analogReadPin(num)
     }
@@ -27,6 +29,7 @@ namespace LogosSmart {
     //% block="photosensitive pin %num value"
     //% group="Photosensitive"
     //% weight=99
+    //% color="#f1bd42"
     export function Photosensitive(num: enGPIOpin): number {
         return pins.analogReadPin(num)
     }
@@ -37,6 +40,7 @@ namespace LogosSmart {
     //% block="grayscale pin %num value"
     //% group="Grayscale"
     //% weight=99
+    //% color="#f1bd42"
     export function Grayscale( num: enGPIOpin): number {
         return pins.analogReadPin(num)
     }
@@ -47,6 +51,7 @@ namespace LogosSmart {
     //% block="soil humidity sensor pin %num value"
     //% group="Soil Humidity"
     //% weight=99
+    //% color="#f1bd42"
     export function SoilHumiditySensor( num: enGPIOpin): number {
         return pins.analogReadPin(num)
     }
