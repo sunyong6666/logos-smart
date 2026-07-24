@@ -13,6 +13,24 @@ enum enGPIOpin {
     p3 = AnalogPin.P8
 }
 
+//比较
+enum SmartCompare {
+    //% block=">"
+    Greater = 0,
+
+    //% block=">="
+    GreaterEqual = 1,
+
+    //% block="="
+    Equal = 2,
+
+    //% block="<="
+    LessEqual = 3,
+
+    //% block="<"
+    Less = 4
+}
+
 
 //% color="#24cfc9" icon="" block="Smart TEAM"
 namespace LogosSmart {

@@ -1,20 +1,62 @@
 //-------三路灰度巡线-------
 
-const LineFollower_I2cAddress_2 = 0x29
+const ThreeWayGray_I2cAddress = 0x29
+
+enum GraySensor {
+    //% block="1"
+    Sensor1 = 0,
+
+    //% block="2"
+    Sensor2 = 1,
+
+    //% block="3"
+    Sensor3 = 2
+}
 
 
-    
 namespace LogosSmart {
 
-     //% blockId=LineFollower29_Debug
-    //% block="Line follower 0x29 debug read"
-    //% group="Line Follower Sensor"
+    //读值
+    //% blockId=ThreeWayGray_Read
+    //% block="three way gray gray sensor read %sensor"
+    //% group="Three Way Gray Sensor"
+    //% weight=100
+    export function threeWayGrayRead(sensor: GraySensor): number {
+        let buf = pins.i2cReadBuffer(ThreeWayGray_I2cAddress, 3)
+        return buf[sensor]
+    }
+
+    //判断值
+    //% blockId=ThreeWayGray_Check
+    //% block="three way gray sensor %sensor value %compare %value"
+    //% value.min=0 value.max=255
+    //% group="Three Way Gray Sensor"
     //% weight=99
-    export function lineFollower29Debug(): string {
+    export function threeWayGrayCheck(sensor: GraySensor, compare: SmartCompare, value: number): boolean {
+        let buf = pins.i2cReadBuffer(ThreeWayGray_I2cAddress, 3)
+        let data = buf[sensor]
 
-        let buf = pins.i2cReadBuffer(LineFollower_I2cAddress_2, 1)
+        if (compare == SmartCompare.Greater) {
+            return data > value
+        }
 
-        return buf[0].toString()
-}
+        if (compare == SmartCompare.GreaterEqual) {
+            return data >= value
+        }
+
+        if (compare == SmartCompare.Equal) {
+            return data == value
+        }
+
+        if (compare == SmartCompare.LessEqual) {
+            return data <= value
+        }
+
+        if (compare == SmartCompare.Less) {
+            return data < value
+        }
+
+        return false
+    }
 
 }
