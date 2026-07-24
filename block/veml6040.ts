@@ -51,8 +51,10 @@ enum enRGB {
     Blue,
 }
 
-namespace LogosScratchJr {
+namespace LogosSmart {
     let veml_initialized = false
+
+    // ==================== 辅助函数 ====================
 
     function setConfiguration() {
         let buf = pins.createBuffer(3)
@@ -111,9 +113,13 @@ namespace LogosScratchJr {
     }
 
 
+    // ==================== 功能模块 ====================
+
+    //初始化
     //% blockId=init_veml
     //% block="init color sensor"
-    //% group="Color Sensor" weight=39
+    //% group="Color Sensor" 
+    //% weight=99
     export function init_veml(): void {
         if (!veml_initialized) {
             setConfiguration();
@@ -123,9 +129,11 @@ namespace LogosScratchJr {
         }
     }
 
+    //检测颜色
     //% blockId=isColorDetected
     //% block="detect color %color?"
-    //% group="Color Sensor" weight=38
+    //% group="Color Sensor" 
+    //% weight=98
     export function isColorDetected(color: DetectedColor): boolean {
         updateRGB()
 
@@ -144,6 +152,8 @@ namespace LogosScratchJr {
         nr /= sum
         ng /= sum
         nb /= sum
+
+        serial.writeLine("r="+nr + " g="+ng + " b="+nb)
 
         // ===== 计算 max/min =====
         let max = max3(nr, ng, nb)
@@ -209,9 +219,11 @@ namespace LogosScratchJr {
         return false
     }
 
+    //读取亮度
     //% blockId=readWhiteValue
     //% block="read brightness"
-    //% group="Color Sensor" weight=36
+    //% group="Color Sensor" 
+    //% weight=97
     export function readWhiteValue(): number {
         updateRGB()
 

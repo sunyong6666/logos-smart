@@ -2,11 +2,11 @@
 const ultrasonicI2cAddress = 0x23;
 const ULTRASONIC_BASE = 0x0A;
 
-namespace LogosScratchJr {
+namespace LogosSmart {
     //% blockId=ultrasonicGetDistance
     //% block="ultrasonic distance (mm)"
-    //% group="Ultrasonic"
-    //% weight=100
+    //% group="Distance Sensor"
+    //% weight=99
     export function ultrasonicDistance(): number {
         basic.pause(20);
         let buf = pins.createBuffer(1);

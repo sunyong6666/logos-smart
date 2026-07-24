@@ -12,7 +12,9 @@
         "block/lcd1602.ts",
         "block/rgbLED.ts",
         "block/sensorGPIO.ts",
-        "block/sensorIIC.ts",
+        "block/ultrasonic.ts",
+        "block/joystick.ts",
+        "block/veml6040.ts",
         "README.md"
     ],
     "testFiles": [

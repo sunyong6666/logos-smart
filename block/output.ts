@@ -5,7 +5,7 @@ namespace LogosSmart {
     //% blockId=LogosSmart_Servo
     //% block="servo pin %num angle %value"
     //% value.min=0 value.max=180
-    //% group="Servo"
+    //% group="Geek Servo"
     //% weight=99
     //% color="#f1bd42"
     export function Servo(num: enGPIOpin, value: number): void {
@@ -16,7 +16,7 @@ namespace LogosSmart {
     // ==================== LED模块 ====================
     //% blockId=LogosSmart_LED_on
     //% block="LED pin %num on"
-    //% group="LED"
+    //% group="LED Module"
     //% weight=89
     //% color="#f1bd42"
     export function LEDOn(num: enGPIOpin): void {
@@ -25,7 +25,7 @@ namespace LogosSmart {
 
     //% blockId=LogosSmart_LED_off
     //% block="LED pin %num off"
-    //% group="LED"
+    //% group="LED Module"
     //% weight=88
     //% color="#f1bd42"
     export function LEDOff(num: enGPIOpin): void {
@@ -36,7 +36,7 @@ namespace LogosSmart {
     // ==================== 风扇模块 ====================
     //% blockId=LogosSmart_Fan_on
     //% block="fan pin %num on"
-    //% group="Fan"
+    //% group="Fan Module"
     //% weight=79
     //% color="#f1bd42"
     export function FanOn(num: enGPIOpin): void {
@@ -45,7 +45,7 @@ namespace LogosSmart {
 
     //% blockId=LogosSmart_Fan_off
     //% block="fan pin %num off"
-    //% group="Fan"
+    //% group="Fan Module"
     //% weight=78
     //% color="#f1bd42"
     export function FanOff(num: enGPIOpin): void {

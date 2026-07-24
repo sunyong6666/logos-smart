@@ -41,8 +41,8 @@ namespace LogosSmart {
 
     // 设置全部RGB LED颜色
     //% blockId=LogosSmart_RGBLed_SetColor
-    //% block="RGB LED set color r %r g %g b %b"
-    //% group="RGB LED"
+    //% block="LED strip set color r %r g %g b %b"
+    //% group="LED Strip Module"
     //% weight=100
     //% r.min=0 r.max=255 r.defl=0
     //% g.min=0 g.max=255 g.defl=0
@@ -62,8 +62,8 @@ namespace LogosSmart {
 
     // 设置单个RGB LED颜色
     //% blockId=LogosSmart_RGBLed_SetPixel
-    //% block="RGB LED LED %index color r %r g %g b %b"
-    //% group="RGB LED"
+    //% block="LED strip %index color r %r g %g b %b"
+    //% group="LED Strip Module"
     //% weight=98
     //% r.min=0 r.max=255 r.defl=0
     //% g.min=0 g.max=255 g.defl=0
@@ -82,8 +82,8 @@ namespace LogosSmart {
 
     // 关闭单个RGB LED
     //% blockId=LogosSmart_RGBLed_OffPixel
-    //% block="RGB LED turn off LED %index"
-    //% group="RGB LED"
+    //% block="LED strip turn off LED %index"
+    //% group="LED Strip Module"
     //% weight=97
     export function RGBLedOffPixel(index: RGBLedIndex): void {
         rgbLedColors[index * 3] = 0
@@ -94,8 +94,8 @@ namespace LogosSmart {
 
     // 关闭全部RGB LED
     //% blockId=LogosSmart_RGBLed_OffAll
-    //% block="RGB LED turn off all LEDs"
-    //% group="RGB LED"
+    //% block="LED strip turn off all LEDs"
+    //% group="LED Strip Module"
     //% weight=96
     export function RGBLedOffAll(): void {
         for (let i = 0; i < 18; i++) {

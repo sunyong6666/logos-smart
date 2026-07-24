@@ -52,7 +52,7 @@ namespace LogosSmart {
 
     //% blockId=LogosSmart_LCD1602_Init
     //% block="init LCD1602"
-    //% group="LCD1602"
+    //% group="LCD Display"
     //% weight=100
     export function LCD1602Init() {
         basic.pause(50)
@@ -77,7 +77,7 @@ namespace LogosSmart {
     // 清屏
     //% blockId=LogosSmart_LCD1602_Clear
     //% block="LCD1602 clear"
-    //% group="LCD1602"
+    //% group="LCD Display"
     //% weight=99
     export function LCD1602Clear() {
         command(0x01)
@@ -90,7 +90,7 @@ namespace LogosSmart {
     //% text.defl="hello"
     //% row.min=0 row.max=1 row.defl=0
     //% col.min=0 col.max=15 col.defl=0
-    //% group="LCD1602"
+    //% group="LCD Display"
     //% weight=98
     export function LCD1602Show(text: string, row: number,col: number) {
         let now = control.millis()
@@ -110,7 +110,7 @@ namespace LogosSmart {
     //% num.defl=0
     //% row.min=0 row.max=1 row.defl=0
     //% col.min=0 col.max=15 col.defl=0
-    //% group="LCD1602"
+    //% group="LCD Display"
     //% weight=97
     export function LCD1602Number(num: number,row: number,col: number) {
         LCD1602Show(num.toString(),row,col)
@@ -120,7 +120,7 @@ namespace LogosSmart {
     // 背光控制
     //% blockId=LogosSmart_LCD1602_Backlight
     //% block="LCD1602 backlight %state"
-    //% group="LCD1602"
+    //% group="LCD Display"
     //% weight=96
     export function LCD1602Backlight(state: LcdBacklight) {
         lcdBacklight =state == LcdBacklight.On? 0x08: 0x00
