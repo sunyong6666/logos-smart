@@ -35,7 +35,7 @@ namespace LogosSmart {
     //% direction.fieldOptions.width=220
     //% direction.fieldOptions.columns=2
     //% group="Joystick Module"
-    //% weight=27
+    //% weight=99
     export function rockerGetValue(direction: rocket): number {
         let buf = pins.createBuffer(3)
 
@@ -57,7 +57,7 @@ namespace LogosSmart {
     //% orientation.fieldOptions.width=220
     //% orientation.fieldOptions.columns=2
     //% group="Joystick Module"
-    //% weight=26
+    //% weight=98
     export function rockerDetect(orientation: rock): boolean {
         let buf = pins.createBuffer(3)
 
