@@ -62,12 +62,14 @@ namespace LogosSmart {
 
     // 设置单个RGB LED颜色
     //% blockId=LogosSmart_RGBLed_SetPixel
-    //% block="LED strip %index color r %r g %g b %b"
-    //% group="LED Strip Module"
-    //% weight=98
+    //% block="LED strip %index|color r %r g %g b %b"
+    //% inlineInputMode=inline
     //% r.min=0 r.max=255 r.defl=0
     //% g.min=0 g.max=255 g.defl=0
     //% b.min=0 b.max=255 b.defl=0
+    //% group="LED Strip Module"
+    //% weight=98
+    
     export function RGBLedSetPixel(index: RGBLedIndex, r: number, g: number, b: number): void {
         r = limitRGB(r)
         g = limitRGB(g)
