@@ -20,6 +20,8 @@ const IT_320MS = 0x30
 const AF_AUTO = 0x00
 const SD_ENABLE = 0x00
 
+const READ_INTERVAL = 320
+
 enum DetectedColor {
     //% block="red"
     Red,
@@ -54,6 +56,13 @@ enum enRGB {
 namespace LogosSmart {
     let veml_initialized = false
 
+    let cacheR = 0
+    let cacheG = 0
+    let cacheB = 0
+    let cacheW = 0
+
+    let lastReadTime = 0
+
     // ==================== 辅助函数 ====================
 
     function setConfiguration() {
@@ -76,14 +85,6 @@ namespace LogosSmart {
 
         return data[0] | (data[1] << 8)
     }
-
-    let cacheR = 0
-    let cacheG = 0
-    let cacheB = 0
-    let cacheW = 0
-
-    let lastReadTime = 0
-    const READ_INTERVAL = 320
 
     function updateRGB() {
         if (!veml_initialized) {
@@ -177,7 +178,7 @@ namespace LogosSmart {
         if (max != min) {
             s = (max - min) / max
         }
-        serial.writeLine("S="+s + " w="+w)
+        //serial.writeLine("S="+s + " w="+w)
         // ===== 黑白判断 =====
         // 黑色：亮度低
         if (w < 8500) {
@@ -207,10 +208,10 @@ namespace LogosSmart {
 
         // ===== 分类（区间判断）=====
         if (color == DetectedColor.Red) {
-            if (h < 16 || h >= 345) return true
+            if (h < 6 || h >= 345) return true
             return false
         } else if (color == DetectedColor.Orange) {
-            if (h >= 16 && h < 35) return true
+            if (h >= 6 && h < 35) return true
             return false
         } else if (color == DetectedColor.Yellow) {
             if (h >= 35 && h < 70) return true
@@ -219,10 +220,10 @@ namespace LogosSmart {
             if (h >= 70 && h < 180) return true
             return false
         } else if (color == DetectedColor.Cyan) {
-            if (h >= 180 && h < 200) return true
+            if (h >= 180 && h < 205) return true
             return false
         } else if (color == DetectedColor.Blue) {
-            if (h >= 200 && h < 240) return true
+            if (h >= 205 && h < 240) return true
             return false
         } else if (color == DetectedColor.Purple) {
             if (h >= 240 && h < 345) return true
@@ -238,12 +239,10 @@ namespace LogosSmart {
     //% weight=97
     export function readWhiteValue(): number {
         updateRGB()
-
         let nw = Math.round(cacheW * 255 / 65535)
 
         if (nw > 255) nw = 255
         if (nw < 0) nw = 0
-
         return nw
     }
 
