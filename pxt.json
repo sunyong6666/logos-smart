@@ -6,7 +6,6 @@
         "microphone": "*"
     },
     "files": [
-        "icon.svg",
         "main.ts",
         "block/servoMotor.ts",
         "block/output.ts",
@@ -31,6 +30,5 @@
     "supportedTargets": [
         "microbit"
     ],
-    "preferredEditor": "tsprj",
-    "icon": "icon.svg"
+    "preferredEditor": "tsprj"
 }
