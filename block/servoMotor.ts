@@ -65,11 +65,32 @@ namespace LogosSmart {
         }
     }
 
+
+    // ==================== 读取 ====================
+
+    //获取速度
+    //% blockId=Motor_ReadSpeed
+    //% block="read speed of %motoraddress motor"
+    //% group="Servo Motor" 
+    //% weight=99
+    export function readSpeed(motoraddress: MotorAddr): number {
+        return pins.i2cReadBuffer(motoraddress, 6).getNumber(NumberFormat.Int8BE, 0)
+    }
+
+    //获取位置
+    //% blockId=Motor_ReadPos
+    //% block="read position of %motoraddress motor"
+    //% group="Servo Motor" 
+    //% weight=98
+    export function readPos(motoraddress: MotorAddr): number {
+        return getMotorLocation(pins.i2cReadBuffer(motoraddress, 6))
+    }
+
     // ==================== 单电机 ====================
 
     //速度模式
     //% blockId=Motor_Run
-    //% block="Motor %motoraddress rotate at %speed "
+    //% block="motor %motoraddress rotate at %speed "
     //% speed.min=-100 speed.max=100
     //% group="Servo Motor" 
     //% weight=89
@@ -92,13 +113,63 @@ namespace LogosSmart {
         pins.i2cWriteBuffer(motoraddress, SetBuff)
     }
 
+    // 定时运行
+    //% blockId=Motor_RunTime
+    //% block="motor %motoraddress rotate at %speed for %time seconds"
+    //% speed.min=-100 speed.max=100
+    //% group="Servo Motor" 
+    //% weight=88
+    export function runTime(motoraddress: MotorAddr, speed: number, time: number): void {
+        speed = speed / 2
+        if (time > 0 && time < 0.1) time = 0.1
+        time = time * 10
+
+        let speed_Buff: number
+        if (speed < 0) {
+            speed = -speed
+            speed_Buff = (~speed) + 1
+            speed_Buff = speed_Buff | 0x80
+        } else {
+            speed_Buff = speed
+        }
+
+        let SetBuff = pins.createBuffer(4)
+        SetBuff.setNumber(NumberFormat.UInt8BE, 0, 0x12)
+        SetBuff.setNumber(NumberFormat.UInt8BE, 1, speed_Buff)
+        SetBuff.setNumber(NumberFormat.UInt8BE, 2, time >> 8)
+        SetBuff.setNumber(NumberFormat.UInt8BE, 3, time)
+
+        let flag4 = 0
+        pins.i2cWriteBuffer(motoraddress, SetBuff)
+
+        if (time != 0) {
+            if (speed <= 0) {
+                // 负速度用 millis 延时等待
+                let waitFalg = control.millis() + (time * 100)
+                while (control.millis() <= waitFalg) { }
+            } else {
+                let GetBuff = pins.createBuffer(6)
+                while (true) {
+                    GetBuff = pins.i2cReadBuffer(motoraddress, 6)
+                    flag4 = GetBuff.getNumber(NumberFormat.Int8BE, 5)
+                    if (flag4 == 0x7) break
+                }
+                while (true) {
+                    GetBuff = pins.i2cReadBuffer(motoraddress, 6)
+                    flag4 = GetBuff.getNumber(NumberFormat.Int8BE, 5)
+                    if (flag4 == 11) break
+                }
+            }
+        }
+    }
+
     // 绝对位置
     //% blockId=Motor_Goto
-    //% block="Motor %motoraddress rotate at %speed to %location|°"
+    //% block="motor %motoraddress rotate at %speed to %location|°"
     //% speed.min=0 speed.max=100
     //% location.min=-360 location.max=360
     //% group="Servo Motor" 
-    //% weight=88
+    //% weight=87
     export function goto(motoraddress: MotorAddr, speed: number, location: number): void {
         if (speed == 0) return
 
@@ -151,11 +222,11 @@ namespace LogosSmart {
 
     // 相对位置
     //% blockId=Motor_MoveRel
-    //% block="Motor %motoraddress rotate at %speed by %location|°"
+    //% block="motor %motoraddress rotate at %speed by %location|°"
     //% speed.min=-100 speed.max=100
     //% location.min=0
     //% group="Servo Motor" 
-    //% weight=87
+    //% weight=86
     export function moveRel(motoraddress: MotorAddr, speed: number, location: number): void {
         // ±5度内忽略
         if (((location <= 5) && (location >= 0)) || ((location >= -5) && (location <= 0))) return
@@ -199,55 +270,6 @@ namespace LogosSmart {
         }
     }
 
-    // 定时运行
-    //% blockId=Motor_RunTime
-    //% block="Motor %motoraddress rotate at %speed for %time seconds"
-    //% speed.min=-100 speed.max=100
-    //% group="Servo Motor" 
-    //% weight=86
-    export function runTime(motoraddress: MotorAddr, speed: number, time: number): void {
-        speed = speed / 2
-        if (time > 0 && time < 0.1) time = 0.1
-        time = time * 10
-
-        let speed_Buff: number
-        if (speed < 0) {
-            speed = -speed
-            speed_Buff = (~speed) + 1
-            speed_Buff = speed_Buff | 0x80
-        } else {
-            speed_Buff = speed
-        }
-
-        let SetBuff = pins.createBuffer(4)
-        SetBuff.setNumber(NumberFormat.UInt8BE, 0, 0x12)
-        SetBuff.setNumber(NumberFormat.UInt8BE, 1, speed_Buff)
-        SetBuff.setNumber(NumberFormat.UInt8BE, 2, time >> 8)
-        SetBuff.setNumber(NumberFormat.UInt8BE, 3, time)
-
-        let flag4 = 0
-        pins.i2cWriteBuffer(motoraddress, SetBuff)
-
-        if (time != 0) {
-            if (speed <= 0) {
-                // 负速度用 millis 延时等待
-                let waitFalg = control.millis() + (time * 100)
-                while (control.millis() <= waitFalg) { }
-            } else {
-                let GetBuff = pins.createBuffer(6)
-                while (true) {
-                    GetBuff = pins.i2cReadBuffer(motoraddress, 6)
-                    flag4 = GetBuff.getNumber(NumberFormat.Int8BE, 5)
-                    if (flag4 == 0x7) break
-                }
-                while (true) {
-                    GetBuff = pins.i2cReadBuffer(motoraddress, 6)
-                    flag4 = GetBuff.getNumber(NumberFormat.Int8BE, 5)
-                    if (flag4 == 11) break
-                }
-            }
-        }
-    }
 
 
 
@@ -265,7 +287,7 @@ namespace LogosSmart {
 
     //速度模式
     //% blockId=Motor_RunDual
-    //% block="Dual motors rotate at %speed1 and %speed2"
+    //% block="dual motors rotate at %speed1 and %speed2"
     //% speed1.min=-100 speed1.max=100
     //% speed2.min=-100 speed2.max=100
     //% group="Servo Motor" 
@@ -309,14 +331,89 @@ namespace LogosSmart {
         pins.i2cWriteBuffer(rightMotorAddr, SetBuffc)
     }
 
-    // ==================== 双电机：绝对位置 ====================
+    // 定时运行
+    //% blockId=Motor_TimeDual
+    //% block="dual motors rotate at %speed1 and %speed2 for %time seconds"
+    //% speed1.min=-100 speed1.max=100
+    //% speed2.min=-100 speed2.max=100
+    //% time.min=0
+    //% group="Servo Motor" 
+    //% weight=77
+    export function timeDual(speed1: number, speed2: number, time: number): void {
+        speed1 = -speed1 / 2
+        speed2 = speed2 / 2
+        if (time > 0 && time < 0.1) time = 0.1
+        time = time * 10
 
+        let speed_Buff32: number
+        if (speed1 < 0) {
+            speed1 = -speed1
+            speed_Buff32 = (~speed1) + 1
+            speed_Buff32 = speed_Buff32 | 0x80
+        } else {
+            speed_Buff32 = speed1
+        }
+
+        let speed_Buff4: number
+        if (speed2 < 0) {
+            speed2 = -speed2
+            speed_Buff4 = (~speed2) + 1
+            speed_Buff4 = speed_Buff4 | 0x80
+        } else {
+            speed_Buff4 = speed2
+        }
+
+        let SetBuff32 = pins.createBuffer(4)
+        let SetBuff4 = pins.createBuffer(4)
+
+        SetBuff32.setNumber(NumberFormat.UInt8BE, 0, 0x12)
+        SetBuff32.setNumber(NumberFormat.UInt8BE, 1, speed_Buff32)
+        SetBuff32.setNumber(NumberFormat.UInt8BE, 2, time >> 8)
+        SetBuff32.setNumber(NumberFormat.UInt8BE, 3, time)
+
+        SetBuff4.setNumber(NumberFormat.UInt8BE, 0, 0x12)
+        SetBuff4.setNumber(NumberFormat.UInt8BE, 1, speed_Buff4)
+        SetBuff4.setNumber(NumberFormat.UInt8BE, 2, time >> 8)
+        SetBuff4.setNumber(NumberFormat.UInt8BE, 3, time)
+
+        if (speed1 != 0) pins.i2cWriteBuffer(leftMotorAddr, SetBuff32)
+        if (speed2 != 0) pins.i2cWriteBuffer(rightMotorAddr, SetBuff4)
+
+        if ((time !== 0) && ((speed1 !== 0) || (speed2 !== 0))) {
+            let GetBuff7 = pins.createBuffer(6)
+            let GetBuff12 = pins.createBuffer(6)
+
+            GetBuff7 = pins.i2cReadBuffer(rightMotorAddr, 6)
+            GetBuff12 = pins.i2cReadBuffer(leftMotorAddr, 6)
+
+            let flag6 = GetBuff7.getNumber(NumberFormat.Int8BE, 5)
+            let flag12 = GetBuff12.getNumber(NumberFormat.Int8BE, 5)
+
+            while (true) {
+                GetBuff7 = pins.i2cReadBuffer(rightMotorAddr, 6)
+                GetBuff12 = pins.i2cReadBuffer(leftMotorAddr, 6)
+                flag6 = GetBuff7.getNumber(NumberFormat.Int8BE, 5)
+                flag12 = GetBuff12.getNumber(NumberFormat.Int8BE, 5)
+                if (flag12 == 0x7 || flag6 == 0x7) break
+            }
+            while (true) {
+                GetBuff7 = pins.i2cReadBuffer(rightMotorAddr, 6)
+                GetBuff12 = pins.i2cReadBuffer(leftMotorAddr, 6)
+                flag6 = GetBuff7.getNumber(NumberFormat.Int8BE, 5)
+                flag12 = GetBuff12.getNumber(NumberFormat.Int8BE, 5)
+                if ((flag12 == 11) && (flag6 == 11)) break
+            }
+        }
+    }
+
+    //绝对位置
     //% blockId=Motor_GotoDual
-    //% block="双电机 左速 %speed1 右速 %speed2 转 %location|°"
+    //% block="dual motors rotate at %speed1 and %speed2 to %location|°"
     //% speed1.min=-100 speed1.max=100
     //% speed2.min=-100 speed2.max=100
     //% location.min=0
-    //% group="Servo Motor" weight=90
+    //% group="Servo Motor" 
+    //% weight=76
     export function gotoDual(speed1: number, speed2: number, location: number): void {
         if (((location <= 5) && (location >= 0)) || ((location >= -5) && (location <= 0))) return
 
@@ -385,96 +482,5 @@ namespace LogosSmart {
         }
     }
 
-    // ==================== 双电机：定时运行 ====================
 
-    //% blockId=Motor_TimeDual
-    //% block="双电机 左速 %speed1 右速 %speed2 运行 %time|秒"
-    //% speed1.min=-100 speed1.max=100
-    //% speed2.min=-100 speed2.max=100
-    //% time.min=0
-    //% group="Servo Motor" weight=88
-    export function timeDual(speed1: number, speed2: number, time: number): void {
-        speed1 = -speed1 / 2
-        speed2 = speed2 / 2
-        if (time > 0 && time < 0.1) time = 0.1
-        time = time * 10
-
-        let speed_Buff32: number
-        if (speed1 < 0) {
-            speed1 = -speed1
-            speed_Buff32 = (~speed1) + 1
-            speed_Buff32 = speed_Buff32 | 0x80
-        } else {
-            speed_Buff32 = speed1
-        }
-
-        let speed_Buff4: number
-        if (speed2 < 0) {
-            speed2 = -speed2
-            speed_Buff4 = (~speed2) + 1
-            speed_Buff4 = speed_Buff4 | 0x80
-        } else {
-            speed_Buff4 = speed2
-        }
-
-        let SetBuff32 = pins.createBuffer(4)
-        let SetBuff4 = pins.createBuffer(4)
-
-        SetBuff32.setNumber(NumberFormat.UInt8BE, 0, 0x12)
-        SetBuff32.setNumber(NumberFormat.UInt8BE, 1, speed_Buff32)
-        SetBuff32.setNumber(NumberFormat.UInt8BE, 2, time >> 8)
-        SetBuff32.setNumber(NumberFormat.UInt8BE, 3, time)
-
-        SetBuff4.setNumber(NumberFormat.UInt8BE, 0, 0x12)
-        SetBuff4.setNumber(NumberFormat.UInt8BE, 1, speed_Buff4)
-        SetBuff4.setNumber(NumberFormat.UInt8BE, 2, time >> 8)
-        SetBuff4.setNumber(NumberFormat.UInt8BE, 3, time)
-
-        if (speed1 != 0) pins.i2cWriteBuffer(leftMotorAddr, SetBuff32)
-        if (speed2 != 0) pins.i2cWriteBuffer(rightMotorAddr, SetBuff4)
-
-        if ((time !== 0) && ((speed1 !== 0) || (speed2 !== 0))) {
-            let GetBuff7 = pins.createBuffer(6)
-            let GetBuff12 = pins.createBuffer(6)
-
-            GetBuff7 = pins.i2cReadBuffer(rightMotorAddr, 6)
-            GetBuff12 = pins.i2cReadBuffer(leftMotorAddr, 6)
-
-            let flag6 = GetBuff7.getNumber(NumberFormat.Int8BE, 5)
-            let flag12 = GetBuff12.getNumber(NumberFormat.Int8BE, 5)
-
-            while (true) {
-                GetBuff7 = pins.i2cReadBuffer(rightMotorAddr, 6)
-                GetBuff12 = pins.i2cReadBuffer(leftMotorAddr, 6)
-                flag6 = GetBuff7.getNumber(NumberFormat.Int8BE, 5)
-                flag12 = GetBuff12.getNumber(NumberFormat.Int8BE, 5)
-                if (flag12 == 0x7 || flag6 == 0x7) break
-            }
-            while (true) {
-                GetBuff7 = pins.i2cReadBuffer(rightMotorAddr, 6)
-                GetBuff12 = pins.i2cReadBuffer(leftMotorAddr, 6)
-                flag6 = GetBuff7.getNumber(NumberFormat.Int8BE, 5)
-                flag12 = GetBuff12.getNumber(NumberFormat.Int8BE, 5)
-                if ((flag12 == 11) && (flag6 == 11)) break
-            }
-        }
-    }
-
-    
-
-    // ==================== 读取 ====================
-
-    //% blockId=Motor_ReadSpeed
-    //% block="读取电机 %motoraddress 速度"
-    //% group="Servo Motor" weight=84
-    export function readSpeed(motoraddress: MotorAddr): number {
-        return pins.i2cReadBuffer(motoraddress, 6).getNumber(NumberFormat.Int8BE, 0)
-    }
-
-    //% blockId=Motor_ReadPos
-    //% block="读取电机 %motoraddress 位置"
-    //% group="Servo Motor" weight=82
-    export function readPos(motoraddress: MotorAddr): number {
-        return getMotorLocation(pins.i2cReadBuffer(motoraddress, 6))
-    }
 }
