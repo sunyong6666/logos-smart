@@ -1,7 +1,7 @@
 //---------------------------------- LCD1602 模块 -------------------------------
 
-let lcdLastUpdateTime = 0
-const LCD_INTERVAL = 150
+// let lcdLastUpdateTime = 0
+// const LCD_INTERVAL = 150
 
 enum LcdBacklight {
     //% block="on"
@@ -93,11 +93,11 @@ namespace LogosSmart {
     //% group="LCD Display"
     //% weight=98
     export function LCD1602Show(text: string, row: number,col: number) {
-        let now = control.millis()
-        if (now - lcdLastUpdateTime < LCD_INTERVAL)
-            return
+        // let now = control.millis()
+        // if (now - lcdLastUpdateTime < LCD_INTERVAL)
+        //     return
 
-        lcdLastUpdateTime = now
+        // lcdLastUpdateTime = now
         setCursor(col, row)
         for (let i = 0; i < text.length; i++) {
             data(text.charCodeAt(i))
