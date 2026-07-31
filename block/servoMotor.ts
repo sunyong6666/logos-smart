@@ -32,14 +32,6 @@ namespace LogosSmart {
         return location_Buff
     }
 
-    function getMotorSpeed(buffer: Buffer): number {
-        let v = (buffer.getNumber(NumberFormat.Int8BE, 0) << 8) + buffer.getNumber(NumberFormat.Int8BE, 1)
-        if (v & 0x0080) {
-            return v + 0x0100
-        }
-        return v
-    }
-
     function readFlag(addr: number): number {
         return pins.i2cReadBuffer(addr, 6).getNumber(NumberFormat.Int8BE, 5)
     }
@@ -75,7 +67,9 @@ namespace LogosSmart {
     //% group="Servo Motor" 
     //% weight=99
     export function readSpeed(motoraddress: MotorAddr): number {
-        return pins.i2cReadBuffer(motoraddress, 6).getNumber(NumberFormat.Int8BE, 0)
+        let speed = pins.i2cReadBuffer(motoraddress, 6).getNumber(NumberFormat.Int8BE, 0)
+
+        return speed * 2
     }
 
     //获取位置
@@ -294,8 +288,8 @@ namespace LogosSmart {
     //% group="Servo Motor" 
     //% weight=78
     export function runDual(speed1: number, speed2: number): void {
-        speed1 = -speed1 / 2
-        speed2 = speed2 / 2
+        speed1 = -Math.round(speed1 / 2)
+        speed2 = Math.round(speed2 / 2)
 
         let speed_Buff1: number
         if (speed1 < 0) {
@@ -341,8 +335,8 @@ namespace LogosSmart {
     //% group="Servo Motor" 
     //% weight=77
     export function timeDual(speed1: number, speed2: number, time: number): void {
-        speed1 = -speed1 / 2
-        speed2 = speed2 / 2
+        speed1 = -Math.round(speed1 / 2)
+        speed2 = Math.round(speed2 / 2)
         if (time > 0 && time < 0.1) time = 0.1
         time = time * 10
 
@@ -418,8 +412,8 @@ namespace LogosSmart {
     export function gotoDual(speed1: number, speed2: number, location: number): void {
         if (((location <= 5) && (location >= 0)) || ((location >= -5) && (location <= 0))) return
 
-        speed1 = -speed1 / 2
-        speed2 = speed2 / 2
+        speed1 = -Math.round(speed1 / 2)
+        speed2 = Math.round(speed2 / 2)
 
         let location_Buff1: number
         let location_Buff23: number
