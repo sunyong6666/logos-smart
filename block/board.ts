@@ -231,24 +231,26 @@ namespace LogosSmart {
         pins.i2cWriteBuffer(Board_i2cAddress, cmdBuff);
         basic.pause(50);
     }
+
+
+    //% blockId=motorSeparator
+    //% block=""
+    //% group="Board" weight=90
+    export function motorSeparator(): void {
+        // 仅用于视觉分隔
+    }
     //#########################################################################
     //##################################单电机#################################
     //#########################################################################
     //% blockId=motorGetSpeed
     //% block="get motor %mID speed"
-    //% group="Motor" weight=29
+    //% group="Board" weight=89
     export function motorGetSpeed(mID: motorID): number {
         // 发送指令
         const cmdAddr = mID + 0x01;
         let cmdBuff = pins.createBuffer(1);
         cmdBuff.setNumber(NumberFormat.UInt8BE, 0, cmdAddr);
         pins.i2cWriteBuffer(Board_i2cAddress, cmdBuff);
-        // 拼接 2 字节为 16 位整数
-        // let readBuff = pins.createBuffer(2);
-        // readBuff = pins.i2cReadBuffer(i2cAddress, 2);
-        // let highByte = readBuff.getNumber(NumberFormat.UInt8BE, 0);
-        // let lowByte = readBuff.getNumber(NumberFormat.UInt8BE, 1);
-        // let speed = ((highByte & 0xFF) << 8) | (lowByte & 0xFF);
 
         // 读取2字节数据
         let readBuff = pins.createBuffer(2);
@@ -257,9 +259,10 @@ namespace LogosSmart {
         let speed = readBuff.getNumber(NumberFormat.Int16BE, 0);
         return speed;
     }
+
     //% blockId=motorGetAngle
     //% block="get motor %mID encoder value"
-    //% group="Motor" weight=28
+    //% group="Board" weight=88
     export function motorGetAngle(mID: motorID): number {
         // 发送指令
         const cmdAddr = mID + 0x00;
@@ -279,7 +282,7 @@ namespace LogosSmart {
     //% blockId=motorRun
     //% block="run motor %mID at speed %mspeed"
     //% mspeed.min=-100 mspeed.max=100 mspeed.defl=50
-    //% group="Motor" weight=7
+    //% group="Board" weight=87
     export function motorRun(mID: motorID, mspeed: number): void {
         if (mspeed > 100) mspeed = 100;
         if (mspeed < -100) mspeed = -100;
@@ -304,9 +307,10 @@ namespace LogosSmart {
         cmdBuff.setNumber(NumberFormat.UInt8BE, 1, finalType);
         pins.i2cWriteBuffer(Board_i2cAddress, cmdBuff);
     }
+
     //% blockId=motorRunDistance
     //% block="run motor %mID at speed %mspeed for %distance cm"
-    //% group="Motor" weight=6
+    //% group="Board" weight=86
     //% distance.min=0 distance.max=1000 distance.defl=10
     //% mspeed.min=-100 mspeed.max=100 mspeed.defl=50
     //% inlineInputMode = inline
@@ -358,7 +362,7 @@ namespace LogosSmart {
 
     //% blockId=motorRunAngle
     //% block="run motor %mID at speed %mspeed %angle °"
-    //% group="Motor" weight=5
+    //% group="Board" weight=85
     //% angle.min=0 angle.max=3600 angle.defl=90
     //% mspeed.min=-100 mspeed.max=100 mspeed.defl=50
     //% inlineInputMode = inline
@@ -410,7 +414,7 @@ namespace LogosSmart {
 
     //% blockId=motorStop
     //% block="stop motor %mID"
-    //% group="Motor" weight=3
+    //% group="Board" weight=84
     export function motorStop(mID: motorID): void {
         // 发送停止运动指令
         const cmdAddr = mID + 0x03;
@@ -423,7 +427,7 @@ namespace LogosSmart {
     //% blockId=motorSetPerimeter
     //% block="set motor %mID compensation %num \\%"
     //% num.min=-50 num.max=50 num.defl=0
-    //% group="Motor" weight=2
+    //% group="Board" weight=83
     export function motorSetPerimeter(mID: motorID, num: number): void {
         if (num < -50) num = -50;
         if (num > 50) num = 50;
