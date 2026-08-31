@@ -233,12 +233,6 @@ namespace LogosSmart {
     }
 
 
-    //% blockId=motorSeparator
-    //% block=""
-    //% group="Board" weight=90
-    export function motorSeparator(): void {
-        // 仅用于视觉分隔
-    }
     //#########################################################################
     //##################################单电机#################################
     //#########################################################################
@@ -441,4 +435,51 @@ namespace LogosSmart {
     }
 
 
+    //#########################################################################
+    //##################################氛围灯#################################
+    //#########################################################################
+
+    //% blockId=ambientLightSetBrightness
+    //% block="set ambient light brightness %brightness"
+    //% brightness.min=0 brightness.max=255 brightness.defl=128
+    //% group="Board" weight=79
+    export function ambientLightSetBrightness(brightness: number): void {
+        // 限制亮度范围
+        if (brightness < 0) brightness = 0;
+        if (brightness > 255) brightness = 255;
+
+        const cmdAddr = Board_led_I2cAddress + 0x00;
+        let cmdBuff = pins.createBuffer(2);
+        cmdBuff.setNumber(NumberFormat.UInt8BE, 0, cmdAddr);
+        cmdBuff.setNumber(NumberFormat.UInt8BE, 1, brightness);
+        pins.i2cWriteBuffer(Board_i2cAddress, cmdBuff);
+        basic.pause(20);
+    }
+
+    //% blockId=ambientLightSetColor
+    //% block="set ambient light color R %red G %green B %blue"
+    //% red.min=0 red.max=255 red.defl=255
+    //% green.min=0 green.max=255 green.defl=0
+    //% blue.min=0 blue.max=255 blue.defl=0
+    //% group="Board" weight=77
+    //% inlineInputMode=inline
+    export function ambientLightSetColor(red: number,green: number,blue: number): void {
+        // 限制 RGB 范围
+        if (red < 0) red = 0;
+        if (red > 255) red = 255;
+
+        if (green < 0) green = 0;
+        if (green > 255) green = 255;
+
+        if (blue < 0) blue = 0;
+        if (blue > 255) blue = 255;
+
+        const cmdAddr = Board_led_I2cAddress + 0x01;
+        let cmdBuff = pins.createBuffer(4);
+        cmdBuff.setNumber(NumberFormat.UInt8BE, 0, cmdAddr);
+        cmdBuff.setNumber(NumberFormat.UInt8BE, 1, red);
+        cmdBuff.setNumber(NumberFormat.UInt8BE, 2, green);
+        cmdBuff.setNumber(NumberFormat.UInt8BE, 3, blue);
+        pins.i2cWriteBuffer(Board_i2cAddress, cmdBuff);
+    }
 }
