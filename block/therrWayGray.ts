@@ -138,11 +138,7 @@ namespace LogosSmart {
     }
 
 
-
-
-    //==================================================
     // 设置工作模式
-    //==================================================
     // // % blockId=ColorSensor_SetMode
     // // % block="Three Way Gray Sensor set mode %mode"
     // // % group="Three Way Gray Sensor"
@@ -151,9 +147,7 @@ namespace LogosSmart {
         setMode(mode)
     }
 
-    //==================================================
     // 灰度学习模式
-    //==================================================
     //% blockId=ColorSensor_LearnGrayscale
     //% block="Three Way Gray Sensor learn grayscale threshold"
     //% group="Three Way Gray Sensor"
@@ -162,9 +156,7 @@ namespace LogosSmart {
         sendLearnCommand(4)
     }
 
-    //==================================================
     // 二值化学习模式
-    //==================================================
     //% blockId=ColorSensor_LearnBinary
     //% block="Three Way Gray Sensor learn binary threshold"
     //% group="Three Way Gray Sensor"
@@ -173,9 +165,7 @@ namespace LogosSmart {
         sendLearnCommand(5)
     }
 
-    //==================================================
     // 学习指定颜色阈值
-    //==================================================
     //% blockId=ColorSensor_LearnColor
     //% block="Three Way Gray Sensor learn color %color"
     //% group="Three Way Gray Sensor"
@@ -184,9 +174,7 @@ namespace LogosSmart {
         sendLearnCommand(color + 6)
     }
 
-    //==================================================
     // 清除所有颜色学习数据
-    //==================================================
     //% blockId=ColorSensor_ClearColorData
     //% block="Three Way Gray Sensor clear all color learning data"
     //% group="Three Way Gray Sensor"
@@ -195,9 +183,7 @@ namespace LogosSmart {
         sendLearnCommand(6)
     }
 
-    //==================================================
     // 判断指定通道是否检测到指定颜色
-    //==================================================
     //% blockId=ColorSensor_DetectedColor
     //% block="Three Way Gray Sensor %sensor detects %color"
     //% group="Three Way Gray Sensor"
@@ -212,9 +198,7 @@ namespace LogosSmart {
         return buf[sensor] == color
     }
 
-    //==================================================
     // 判断指定通道是否检测到黑线
-    //==================================================
     //% blockId=ColorSensor_DetectedBlack
     //% block="Three Way Gray Sensor %sensor detected black"
     //% group="Three Way Gray Sensor"
@@ -229,9 +213,7 @@ namespace LogosSmart {
     }
 
 
-    //==================================================
     // 读取灰度识别值
-    //==================================================
     //% blockId=ColorSensor_ReadGrayscale
     //% block="Three Way Gray Sensor %sensor grayscale value"
     //% group="Three Way Gray Sensor"
@@ -243,9 +225,7 @@ namespace LogosSmart {
         return buf[sensor]
     }
 
-    //==================================================
     // 读取原始光敏值
-    //==================================================
     //% blockId=ColorSensor_ReadRaw
     //% block="Three Way Gray Sensor %sensor raw photosensitive value"
     //% group="Three Way Gray Sensor"

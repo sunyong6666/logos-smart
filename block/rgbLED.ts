@@ -1,7 +1,7 @@
 //-------RGB LED-------
+const DEFAULT_RING = 0x24
 const RGB_LED_BASE = 0x0A
-const DEFAULT_RING = 0x24  
-
+  
 enum RGBLedIndex {
     //% block="1"
     LED1 = 0,
