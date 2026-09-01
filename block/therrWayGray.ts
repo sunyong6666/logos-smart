@@ -215,11 +215,11 @@ namespace LogosSmart {
     //==================================================
     // 判断指定通道是否检测到黑线
     //==================================================
-    //% blockId=LineFollower_DetectedBlack
+    //% blockId=ColorSensor_DetectedBlack
     //% block="Three Way Gray Sensor %sensor detected black"
     //% group="Three Way Gray Sensor"
     //% weight=95
-    export function lineFollowerDetected(sensor: ColorSensor): boolean {
+    export function threeGrayDetected(sensor: ColorSensor): boolean {
         // 自动进入二值识别模式
         setMode(ColorSensorMode.BinaryRecognition)
 
