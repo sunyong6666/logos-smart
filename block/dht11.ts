@@ -12,7 +12,12 @@ namespace LogosSmart {
         const register = DHT11_BASE + 0x00 
         pins.i2cWriteNumber( DHT11_ADDR, register, NumberFormat.UInt8BE, false ) 
         const buf = pins.i2cReadBuffer( DHT11_ADDR, 1, false ) 
-        return buf[0] 
+        let temperature = buf[0]
+        if (temperature > 127) {
+            temperature -= 256
+        }
+
+        return temperature
     } 
     
     //% blockId=DHT11_Humidity 
