@@ -52,7 +52,7 @@ namespace LogosSmart {
     //#########################################################################
     //% blockId=motionSpeed
     //% block="move %mtype at speed %mspeed"
-    //% group="Board" weight=99
+    //% group="Smart Chassis" weight=99
     //% mspeed.min=-100 mspeed.max=100 mspeed.defl=50
     export function motionSpeed(mtype: motionType, mspeed: number): void {
         if (mspeed > 100) mspeed = 100;
@@ -94,7 +94,7 @@ namespace LogosSmart {
     }
     //% blockId=motionDistance
     //% block="move %mtype at speed %mspeed for %distance cm"
-    //% group="Board" weight=98
+    //% group="Smart Chassis" weight=98
     //% mspeed.min=-100 mspeed.max=100 mspeed.defl=50
     //% distance.min=0 distance.max=1000 distance.defl=10
     export function motionDistance(mtype: motionType1, mspeed: number, distance: number): void {
@@ -151,7 +151,7 @@ namespace LogosSmart {
     }
     //% blockId=motionAngle
     //% block="move %mtype at speed %mspeed for %angle °"
-    //% group="Board" weight=97
+    //% group="Smart Chassis" weight=97
     //% mspeed.min=-100 mspeed.max=100 mspeed.defl=50
     //% angle.min=0 angle.max=1000 angle.defl=90
     export function motionAngle(mtype: motionType2, mspeed: number, angle: number): void {
@@ -207,7 +207,7 @@ namespace LogosSmart {
     }
     //% blockId=motionStop
     //% block="stop motion"
-    //% group="Board" weight=96
+    //% group="Smart Chassis" weight=96
     export function motionStop(): void {
         const regAddr = Board_group_I2cAddress + 0x00;//执行
         let cmdBuff = pins.createBuffer(2);
@@ -218,7 +218,7 @@ namespace LogosSmart {
     //% blockId=motionSetWheel
     //% block="set rotation angle compensation %num \\%"
     //% num.min=-50 num.max=50 num.defl=0
-    //% group="Board" weight=95
+    //% group="Smart Chassis" weight=95
     export function motionSetWheel(num: number): void {
         if (num < -50) num = -50;
         if (num > 50) num = 50;
@@ -238,7 +238,7 @@ namespace LogosSmart {
     //#########################################################################
     //% blockId=motorGetSpeed
     //% block="get motor %mID speed"
-    //% group="Board" weight=89
+    //% group="Smart Chassis" weight=89
     export function motorGetSpeed(mID: motorID): number {
         // 发送指令
         const cmdAddr = mID + 0x01;
@@ -256,7 +256,7 @@ namespace LogosSmart {
 
     //% blockId=motorGetAngle
     //% block="get motor %mID encoder value"
-    //% group="Board" weight=88
+    //% group="Smart Chassis" weight=88
     export function motorGetAngle(mID: motorID): number {
         // 发送指令
         const cmdAddr = mID + 0x00;
@@ -276,7 +276,7 @@ namespace LogosSmart {
     //% blockId=motorRun
     //% block="run motor %mID at speed %mspeed"
     //% mspeed.min=-100 mspeed.max=100 mspeed.defl=50
-    //% group="Board" weight=87
+    //% group="Smart Chassis" weight=87
     export function motorRun(mID: motorID, mspeed: number): void {
         if (mspeed > 100) mspeed = 100;
         if (mspeed < -100) mspeed = -100;
@@ -304,7 +304,7 @@ namespace LogosSmart {
 
     //% blockId=motorRunDistance
     //% block="run motor %mID at speed %mspeed for %distance cm"
-    //% group="Board" weight=86
+    //% group="Smart Chassis" weight=86
     //% distance.min=0 distance.max=1000 distance.defl=10
     //% mspeed.min=-100 mspeed.max=100 mspeed.defl=50
     //% inlineInputMode = inline
@@ -356,7 +356,7 @@ namespace LogosSmart {
 
     //% blockId=motorRunAngle
     //% block="run motor %mID at speed %mspeed %angle °"
-    //% group="Board" weight=85
+    //% group="Smart Chassis" weight=85
     //% angle.min=0 angle.max=3600 angle.defl=90
     //% mspeed.min=-100 mspeed.max=100 mspeed.defl=50
     //% inlineInputMode = inline
@@ -408,7 +408,7 @@ namespace LogosSmart {
 
     //% blockId=motorStop
     //% block="stop motor %mID"
-    //% group="Board" weight=84
+    //% group="Smart Chassis" weight=84
     export function motorStop(mID: motorID): void {
         // 发送停止运动指令
         const cmdAddr = mID + 0x03;
@@ -421,7 +421,7 @@ namespace LogosSmart {
     //% blockId=motorSetPerimeter
     //% block="set motor %mID compensation %num \\%"
     //% num.min=-50 num.max=50 num.defl=0
-    //% group="Board" weight=83
+    //% group="Smart Chassis" weight=83
     export function motorSetPerimeter(mID: motorID, num: number): void {
         if (num < -50) num = -50;
         if (num > 50) num = 50;
@@ -442,7 +442,7 @@ namespace LogosSmart {
     //% blockId=ambientLightSetBrightness
     //% block="set ambient light brightness %brightness"
     //% brightness.min=0 brightness.max=255 brightness.defl=128
-    //% group="Board" weight=79
+    //% group="Smart Chassis" weight=79
     export function ambientLightSetBrightness(brightness: number): void {
         // 限制亮度范围
         if (brightness < 0) brightness = 0;
@@ -461,7 +461,7 @@ namespace LogosSmart {
     //% red.min=0 red.max=255 red.defl=255
     //% green.min=0 green.max=255 green.defl=0
     //% blue.min=0 blue.max=255 blue.defl=0
-    //% group="Board" weight=77
+    //% group="Smart Chassis" weight=77
     //% inlineInputMode=inline
     export function ambientLightSetColor(red: number,green: number,blue: number): void {
         // 限制 RGB 范围
