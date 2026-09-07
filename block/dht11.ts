@@ -32,3 +32,29 @@ namespace LogosSmart {
     } 
 
 }
+
+
+
+
+//-------Light Sensor-------
+
+const LIGHT_ADDR = 0x20
+const LIGHT_BASE = 0x0A
+const LIGHT_REG_ANALOG = LIGHT_BASE + 0x00   // 偏移 0x00，模拟值，2字节 0-4095
+
+namespace LogosSmart {
+    //% blockId=Light_AnalogValue
+    //% block="light sensor read analog value"
+    //% group="Light Sensor"
+    //% weight=98
+    export function lightAnalogValue(): number {
+        pins.i2cWriteNumber(
+            LIGHT_ADDR,
+            LIGHT_REG_ANALOG,
+            NumberFormat.UInt8BE,
+            false
+        )
+        const buf = pins.i2cReadBuffer(LIGHT_ADDR, 2, false)
+        return buf.getNumber(NumberFormat.UInt16BE, 0)
+    }
+}
