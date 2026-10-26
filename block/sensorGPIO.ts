@@ -8,7 +8,7 @@ namespace LogosSmart {
     //% group="Button Sensor"
     //% weight=99
     //% color="#f1bd42"
-    export function Button( num: enGPIOpin): boolean {
+    export function Button(num: enGPIOpin_digital): boolean {
         return pins.digitalReadPin(num) == 0
     }
 

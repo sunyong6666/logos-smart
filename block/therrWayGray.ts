@@ -1,66 +1,4 @@
 //-------三路灰度巡线-------
-
-// const ThreeWayGray_I2cAddress = 0x29
-
-// enum GraySensor {
-//     //% block="1"
-//     Sensor1 = 0,
-
-//     //% block="2"
-//     Sensor2 = 1,
-
-//     //% block="3"
-//     Sensor3 = 2
-// }
-
-
-// namespace LogosSmart {
-
-//     //读值
-//     //% blockId=ThreeWayGray_Read
-//     //% block="three way gray gray sensor read %sensor"
-//     //% group="Three Way Gray Sensor"
-//     //% weight=100
-//     export function threeWayGrayRead(sensor: GraySensor): number {
-//         let buf = pins.i2cReadBuffer(ThreeWayGray_I2cAddress, 3)
-//         return buf[sensor]
-//     }
-
-//     //判断值
-//     //% blockId=ThreeWayGray_Check
-//     //% block="three way gray sensor %sensor value %compare %value"
-//     //% value.min=0 value.max=255
-//     //% group="Three Way Gray Sensor"
-//     //% weight=99
-//     export function threeWayGrayCheck(sensor: GraySensor, compare: SmartCompare, value: number): boolean {
-//         let buf = pins.i2cReadBuffer(ThreeWayGray_I2cAddress, 3)
-//         let data = buf[sensor]
-
-//         if (compare == SmartCompare.Greater) {
-//             return data > value
-//         }
-
-//         if (compare == SmartCompare.GreaterEqual) {
-//             return data >= value
-//         }
-
-//         if (compare == SmartCompare.Equal) {
-//             return data == value
-//         }
-
-//         if (compare == SmartCompare.LessEqual) {
-//             return data <= value
-//         }
-
-//         if (compare == SmartCompare.Less) {
-//             return data < value
-//         }
-
-//         return false
-//     }
-
-// }
-
 const ColorSensor_I2cAddress = 0x29
 
 // 传感器通道
@@ -110,7 +48,6 @@ enum ColorType {
 
 
 namespace LogosSmart {
-    let currentMode = -1
 
     //==================================================
     // 设置传感器模式
@@ -119,14 +56,22 @@ namespace LogosSmart {
         pins.i2cWriteNumber(ColorSensor_I2cAddress, mode, NumberFormat.UInt8BE)
         // 等待传感器完成模式切换
         basic.pause(80)
-        currentMode = mode
     }
 
     //==================================================
     // 读取完整的数据包
     //==================================================
-    function readData(): Buffer {
-        return pins.i2cReadBuffer(ColorSensor_I2cAddress, 4)
+    function readData(mode: number): Buffer {
+        let data = pins.i2cReadBuffer(ColorSensor_I2cAddress, 4)
+        if (mode != data[3]){
+            if(mode != 15){
+                setMode(mode)
+            }
+            setMode(15)
+            return pins.createBuffer(0)
+        }
+        //serial.writeLine("最后一位数据: " + data[3])
+        return data
     }
 
     //==================================================
@@ -190,10 +135,10 @@ namespace LogosSmart {
     //% weight=90
     export function detectedColor(sensor: ColorSensor, color: ColorType): boolean {
         // 自动进入颜色识别模式
-        setMode(ColorSensorMode.ColorRecognition)
+        //setMode(ColorSensorMode.ColorRecognition)
 
         // 必须完整读取 4 bytes
-        let buf = readData()
+        let buf = readData(ColorSensorMode.ColorRecognition)
         // 返回值与目标颜色比较
         return buf[sensor] == color
     }
@@ -205,10 +150,10 @@ namespace LogosSmart {
     //% weight=95
     export function threeGrayDetected(sensor: ColorSensor): boolean {
         // 自动进入二值识别模式
-        setMode(ColorSensorMode.BinaryRecognition)
+        //setMode(ColorSensorMode.BinaryRecognition)
 
         // 必须完整读取 4 bytes
-        let buf = readData()
+        let buf = readData(ColorSensorMode.BinaryRecognition)
         return buf[sensor] == 1
     }
 
@@ -219,9 +164,9 @@ namespace LogosSmart {
     //% group="Three Way Gray Sensor"
     //% weight=80
     export function readGrayscale(sensor: ColorSensor): number {
-        setMode(ColorSensorMode.GrayscaleRecognition)
+        //setMode(ColorSensorMode.GrayscaleRecognition)
 
-        let buf = readData()
+        let buf = readData(ColorSensorMode.GrayscaleRecognition)
         return buf[sensor]
     }
 
@@ -231,9 +176,9 @@ namespace LogosSmart {
     //% group="Three Way Gray Sensor"
     //% weight=70
     export function readRaw(sensor: ColorSensor): number {
-        setMode(15)
+        //setMode(15)
 
-        let buf = readData()
+        let buf = readData(15)
         return buf[sensor]
     }
 
@@ -245,18 +190,4 @@ namespace LogosSmart {
         setMode(0)
     }
 
-
-    // //==================================================
-    // // 读取模块当前状态
-    // //==================================================
-
-    // //% blockId=ColorSensor_Status
-    // //% block="Three Way Gray Sensor status"
-    // //% group="Three Way Gray Sensor"
-    // //% weight=60
-    // export function status(): number {
-    //     // 必须完整读取 4 bytes
-    //     let buf = readData()
-    //     return buf[3]
-    // }
 }
