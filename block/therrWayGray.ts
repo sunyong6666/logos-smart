@@ -66,8 +66,10 @@ namespace LogosSmart {
         if (mode != data[3]){
             if(mode != 15){
                 setMode(mode)
+            }else{
+                setMode(15)
             }
-            setMode(15)
+            
             return pins.createBuffer(0)
         }
         //serial.writeLine("最后一位数据: " + data[3])

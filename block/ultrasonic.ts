@@ -69,7 +69,7 @@ namespace LogosSmart {
         let rawDistance = (readBuff[0] << 8) | readBuff[1];
 
         // 转换为mm
-        let distance = Math.round(rawDistance / 100);
+        let distance = Math.round(rawDistance / 1);
         // 两次读取间隔必须 >50ms
         basic.pause(60);
 
