@@ -59,27 +59,24 @@ namespace LogosSmart {
     export function ultrasonicRgbGetDistance(): number {
         //发送距离读取指令
         let cmdBuff = pins.createBuffer(1);
-        //cmdBuff.setNumber(NumberFormat.UInt8BE, 0, 0x00);
         cmdBuff[0] = ULTRASONIC_BASE + 0x00;
 
         pins.i2cWriteBuffer(rgbUltrasonicI2cAddress,cmdBuff,true);
-        // 读取3字节原始距离数据
-        let readBuff = pins.i2cReadBuffer(rgbUltrasonicI2cAddress,3);
+        // 读取2字节原始距离数据
+        let readBuff = pins.i2cReadBuffer(rgbUltrasonicI2cAddress,2);
 
         // 24位数据
-        let rawDistance =
-            (readBuff[0] << 16) |
-            (readBuff[1] << 8) |
-            readBuff[2];
+        let rawDistance = (readBuff[0] << 8) | readBuff[1];
 
         // 转换为mm
-        let distance = Math.round(rawDistance / 1000);
+        let distance = Math.round(rawDistance / 100);
         // 两次读取间隔必须 >50ms
         basic.pause(60);
 
         return distance;
     }
 
+   
 
     //% blockId=ultrasonicRgbSetColor
     //% block="set RGB light brightness %brightness R %red G %green B %blue"
