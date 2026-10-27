@@ -11,6 +11,7 @@
         "block/servoMotor.ts",
         "block/output.ts",
         "block/lcd1602.ts",
+        "block/oled.ts",
         "block/rgbLED.ts",
         "block/sensorGPIO.ts",
         "block/ultrasonic.ts",
